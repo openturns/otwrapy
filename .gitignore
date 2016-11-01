@@ -2,6 +2,7 @@
 .eggs/
 build/
 dist/
+doc/_generated/
 *.egg-info/
 *__pycache__/
 *.log

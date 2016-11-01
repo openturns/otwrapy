@@ -24,6 +24,7 @@ Dependencies
 - openturns
 - ipyparallel (optional)
 - joblib (optional). scikit-learn comes with joblib installed (sklearn.externals.joblib)
+- pathos (optional)
 - pytest (optional for testing)
 - sphinx and numpydoc for building the doc
 
