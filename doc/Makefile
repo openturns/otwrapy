@@ -5,9 +5,9 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = ../../otwrapy-doc
+BUILDDIR      = ../../../otwrapy
 PDFBUILDDIR   = /tmp
-PDF           = ../otwrapy-Documentation.pdf
+PDF           = $(BUILDDIR)
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
