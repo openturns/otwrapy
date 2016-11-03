@@ -451,7 +451,7 @@ def _exec_sample_ipyparallel(func, n, p):
 @NumericalMathFunctionDecorator(enableCache=True)
 class Parallelizer(ot.OpenTURNSPythonFunction):
 
-    """Parallelize a Wrapper using 'ipyparallel', 'joblib', pathos or 'multiprocessing'.
+    """Parallelize a Wrapper using 'ipyparallel', 'joblib', 'pathos' or 'multiprocessing'.
 
     Parameters
     ----------
