@@ -18,7 +18,7 @@ bandwidth = kernel_smoothing.computeSilvermanBandwidth(sample_E)
 E = kernel_smoothing.build(sample_E, bandwidth)
 E.setDescription(['Young modulus'])
 
-F = ot.LogNormal(30000, 9000, 15000, ot.LogNormal.MUSIGMA)
+F = ot.LogNormalMuSigma(30000.0, 9000.0, 15000.0).getDistribution()
 F.setDescription(['Load'])
 
 L = ot.Uniform(250, 260)
