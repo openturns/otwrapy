@@ -13,15 +13,15 @@ audience. Documentation is available
   `ipyparallel <http://ipyparallel.readthedocs.io/en/latest/>`_,
   `joblib <https://pythonhosted.org/joblib/>`_ or
   `pathos <https://pypi.python.org/pypi/pathos>`_.
-- A set of usefull tools that simply recurrent tasks when constructing code
+- A set of usefull tools that simply recurrent tasks when writing code
   wrappers:
 
   - :code:`TempWorkDir`: Context manager that gracefully creates a temporary
     working directory. It handles errors and has the option to cleanup upon
     exit.
   - :code:`Debug`: Decorator that protects the decorated function into a
-    try/except structure so that errors are logged. It is specially usefull
-    when you launch your code in a non interactive environement.
+    try/except structure so that errors are logged. It is specially useful
+    when you launch your code in a non interactive environment.
   - :code:`load_array` and :code:`dump_array`: Used for efficiently create
     and load backups with the option to compress with gzip.
   - :code:`safemakedirs`: Create a directory without raising an exception if
@@ -31,7 +31,7 @@ audience. Documentation is available
 
 :code:`otwrapy` comes from the experience of wrapping a lot of
 different external codes at `Phimeca engineering
-<http://www.phimeca.com>`_. We are a company specialized on
+<http://www.phimeca.com>`_. We are a company specialized in
 uncertainty treatment and we assist our clients introducing the
 probabilistic dimension in their so far deterministic studies.
 
@@ -40,6 +40,6 @@ probabilistic dimension in their so far deterministic studies.
 .. warning::
     While fully usable, otwrapy is still pre-1.0 software and has **no**
     backwards compatibility guarantees until the 1.0 release occurs! Please
-    make sure to be carefull **anytime you upgrade**!
+    make sure to be careful **anytime you upgrade**!
 
 
