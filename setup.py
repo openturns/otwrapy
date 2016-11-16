@@ -6,7 +6,11 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-import otwrapy
+with open('otwrapy/__init__.py') as fid:
+    for line in fid:
+        if line.startswith('__version__'):
+            version = line.strip().split()[-1][1:-1]
+            break
 
 """
 http://python-packaging.readthedocs.org/en/latest/minimal.html
@@ -19,7 +23,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='otwrapy',
-    version=otwrapy.__version__,
+    version=version,
     packages=find_packages(),
     extras_require = {
         'joblib':  ["joblib>=0.9.3"],
