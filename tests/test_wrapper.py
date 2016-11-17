@@ -32,3 +32,11 @@ def test_ipython():
         backend='ipython')
     X = X_distribution.getSample(4)
     Y_sample_multiprocessing = model(X)
+
+def test_pathos():
+    """Test pathos backend
+    """
+    model = otw.Parallelizer(Wrapper(sleep=0.2),
+        backend='pathos')
+    X = X_distribution.getSample(4)
+    Y_sample_multiprocessing = model(X)
