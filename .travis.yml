@@ -11,4 +11,22 @@ install:
 script:
   - nosetests
   - python setup.py install --user
-  - cd doc && make html
+  - cd doc && make html BUILDDIR=~/.local/share/otwrapy/doc
+
+after_success:
+  - test "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH" = "master" || exit 0
+  - git clone https://${GH_TOKEN}@github.com/openturns/openturns.github.io.git
+  - REPO_NAME=`echo "${TRAVIS_REPO_SLUG}" | cut -d "/" -f 2`
+  - mkdir -p openturns.github.io/${REPO_NAME}/${TRAVIS_BRANCH}
+  - cp -r ~/.local/share/${REPO_NAME}/doc/html/* openturns.github.io/${REPO_NAME}/${TRAVIS_BRANCH}
+  - cd openturns.github.io
+  - touch .nojekyll
+  - git config user.email "support@travis-ci.com"
+  - git config user.name "Travis CI"
+  - git add -A .
+  - git commit -a -m "Travis build ${REPO_NAME} ${TRAVIS_BUILD_NUMBER}"
+  - git push --quiet origin master > /dev/null 2>&1
+
+env:
+  global:
+    secure: wLXy+RkvFGhKeyxe33JDoz9WmLnwr6BpuULsNUnf8evkyyH1KnmtOwagXCKJAUHHGK5SJjyd6Fn2NzL1vtS4/EOvUKZkQrve8wmCc+a1oZzh426XZdPowdueSRjXsJaizQrOcduJUizYDvIK0fUhYpNwqjQmYUE23MvY+mjFfQpeNFUSC+lTMkdMj5Ny2P+zVGw5+wnZpRiR3g1bbSmmLI2deMlonBY1RImC9Dhjfla47bzRhBAMrOBqJayZngGZ2410xxY4raUYQuMWkkKVZ+SI1XKE4oV1CMysV58oJOt4IOJnK7ys+lGWFPDKu9Dwolp3FK3L37lHSMPMCW8Bl1erb0/IioOFUka5gJ/7zpC9uWsQvz8rRPRjuKE91jrZ3t5WL9sWmNXYVUSuhTZw1ZNOUolbTdy4SNn5wnhhexZnq1yhxpGm4Tvs3MRFl+UGliG4bH5UM/zr2kvXu+BgbC4saXTu/pUNloMthZT7ECVXKXaSae/udOECW1RxWj/DtEJJbeAwHA3ll7HzddLAWCyPgjmjmc/c7rHX8T0A0D9PDYcb+vWaV3NbX3L9eNYmSfPd473Zkm88w4T4XebzKQCfo8sjs2aoLChxKkU3FdZYi7DjnXeRJPE7/WqAK+jr0C7gIW1xbhfyQwrZ5Bef7m+vy1sESRzVl+LUJ8/Oc7Q=
