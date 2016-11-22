@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/felipeam86/otwrapy.svg?branch=master
+    :target: https://travis-ci.org/felipeam86/otwrapy
+
 .. currentmodule:: otwrapy
 
 :code:`otwrapy` is a collection of tools that simplify the task of wrapping
