@@ -29,6 +29,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
     .. math::
 
         y = \\frac{FL^{3}}{3EI}
+
     with :
 
     - :math:`F` : Load
