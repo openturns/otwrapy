@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/felipeam86/otwrapy.svg?branch=master
-    :target: https://travis-ci.org/felipeam86/otwrapy
+.. image:: https://travis-ci.org/openturns/otwrapy.svg?branch=master
+    :target: https://travis-ci.org/openturns/otwrapy
 
 .. currentmodule:: otwrapy
 
@@ -7,7 +7,7 @@
 external codes in a Python environment as well as parallelizing it. It is built
 on top of `OpenTURNS <http://www.openturns.org>`_, with its users as the target
 audience. Documentation is available
-`here <http://felipeam86.github.io/otwrapy/>`_. The module provides :
+`here <http://openturns.github.io/otwrapy/master>`_. The module provides :
 
 - A :code:`Parallelizer` class that converts any
   `ot.NumericalMathFunction <http://doc.openturns.org/openturns-latest/sphinx/user_manual/_generated/openturns.NumericalMathFunction.html#openturns.NumericalMathFunction>`_

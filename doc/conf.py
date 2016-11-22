@@ -79,7 +79,7 @@ html_theme_options = {
                    'external codes in a Python environment. ' +
                    'Proudly developed at ' +
                    '<b><a href="http://www.phimeca.com">Phimeca</a></b>',
-    'github_user': 'felipeam86',
+    'github_user': 'openturns',
     'github_repo': 'otwrapy',
     'github_banner': True,
     'show_related': True,
