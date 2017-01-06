@@ -133,7 +133,7 @@ class Debug(object):
     you want to have acces to the locals() of the place where the Exception
     jumped. If you bump into such a case, add a try/except structure that
     catches the Exception on the specific place. It is adviced to use the
-    decorator once you have develloped the wrapper and that you are ready to
+    decorator once you have developed the wrapper and that you are ready to
     launch your uncertainty studies.
 
     Parameters
