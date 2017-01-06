@@ -1,42 +1,33 @@
+from __future__ import print_function
 from otwrapy.examples.beam import Wrapper, X_distribution
 import otwrapy as otw
 import openturns as ot
+import multiprocessing
 
-# Monte-Carlo
-ot.RandomGenerator.SetSeed(0)
-X_sample = X_distribution.getSample(10)
-
+def backendtest(backend):
+    ot.RandomGenerator.SetSeed(0)
+    n_cpu = multiprocessing.cpu_count()
+    sizes = [1, n_cpu, n_cpu + 1]
+    if n_cpu > 2:
+        sizes.append(n_cpu - 1)
+    if n_cpu > 3:
+        sizes.append(n_cpu - 2)
+    model = Wrapper(sleep=0.2)
+    model_parallel = otw.Parallelizer(model, backend=backend)
+    for size in sizes:
+        X_sample = X_distribution.getSample(size)
+        Y_ref = model(X_sample)
+        Y_sample = ot.NumericalSample(model_parallel(X_sample))
+        assert Y_ref == Y_sample, 'samples do not match'
 
 def test_joblib():
-    """Test joblib backend
-    """
-    # Joblib backend
-    model = otw.Parallelizer(Wrapper(sleep=0.2),
-        backend='joblib', n_cpus=-1)
-    Y_sample_joblib = model(X_sample)
-    Y_mean_joblib = model(X_distribution.getMean())
+    backendtest('joblib')
 
 def test_multiprocessing():
-    """Test multiprocessing backend
-    """
-    # Multiprocessing backend
-    model = otw.Parallelizer(Wrapper(sleep=0.2),
-        backend='multiprocessing', n_cpus=4)
-    Y_sample_multiprocessing = model(X_sample)
-    Y_mean_multiprocessing = model(X_distribution.getMean())
+    backendtest('multiprocessing')
 
 def test_ipython():
-    """Test ipython backend
-    """
-    model = otw.Parallelizer(Wrapper(sleep=0.2),
-        backend='ipython')
-    X = X_distribution.getSample(4)
-    Y_sample_multiprocessing = model(X)
+    backendtest('ipython')
 
 def test_pathos():
-    """Test pathos backend
-    """
-    model = otw.Parallelizer(Wrapper(sleep=0.2),
-        backend='pathos')
-    X = X_distribution.getSample(4)
-    Y_sample_multiprocessing = model(X)
+    backendtest('pathos')

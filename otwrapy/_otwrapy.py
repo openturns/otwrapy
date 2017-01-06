@@ -404,14 +404,16 @@ def _exec_sample_pathos(func, n_cpus):
             p = ProcessingPool(n_cpus)
             X = np.array(X)
             x = np.array_split(X, n_cpus)
+            # array_split is not supposed to return a list of length n_cpus when len(X)<n_cpus
+            n_active = min(len(X), n_cpus)
             pipe = []
-            for i in range(n_cpus):
+            for i in range(n_active):
                 pipe.append(p.apipe(func, x[i]))
 
             rs = []
-            for i in range(n_cpus):
+            for i in range(n_active):
                 rs.append(pipe[i].get())
-    
+
             rs = [item for sublist in rs for item in sublist]
 
             return ot.NumericalSample(rs)
