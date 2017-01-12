@@ -16,7 +16,7 @@ audience. Documentation is available
   `ipyparallel <http://ipyparallel.readthedocs.io/en/latest/>`_,
   `joblib <https://pythonhosted.org/joblib/>`_ or
   `pathos <https://pypi.python.org/pypi/pathos>`_.
-- A set of usefull tools that simply recurrent tasks when writing code
+- A set of useful tools that simply recurrent tasks when writing code
   wrappers:
 
   - :code:`TempWorkDir`: Context manager that gracefully creates a temporary
