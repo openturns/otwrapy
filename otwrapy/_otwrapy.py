@@ -129,7 +129,7 @@ class Debug(object):
 
     The great benefit of this implementation is that with a simple decorator
     you can protect the methods of your Wrapper class with a try/except
-    structure. However, this might not be usefull for a deeper debugging where
+    structure. However, this might not be useful for a deeper debugging where
     you want to have acces to the locals() of the place where the Exception
     jumped. If you bump into such a case, add a try/except structure that
     catches the Exception on the specific place. It is adviced to use the
