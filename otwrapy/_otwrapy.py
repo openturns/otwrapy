@@ -276,10 +276,10 @@ class TempWorkDir(object):
 
     Examples
     --------
-    In the following example, everything that is executed inside the :code:`with`
-    environement will happen at a temporary working directory created at
+    In the following example, everything that is executed inside the `with`
+    environment will happen at a temporary working directory created at
     :file:`/tmp` with :file:`/run-` as a prefix. The created directory will be
-    erased upon the exit of the  :code:`with` environement and python will go
+    erased upon the exit of the  `with` environement and python will go
     back to the preceeding working directory, even if an Exception is raised.
 
     >>> import otwrapy as otw
@@ -481,11 +481,11 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     >>> import otwrapy as otw
     >>> model = otw.Parallelizer(Wrapper(), n_cpus=-1)
 
-    :code:`model` will distribute calls to Wrapper() using multiprocessing and
+    `model` will distribute calls to Wrapper() using multiprocessing and
     as many CPUs as you have minus one for the scheduler.
 
     Because Parallelize is decorated with :class:`NumericalMathFunctionDecorator`,
-    :code:`model` is already an :class:`ot.NumericalMathFunction`.
+    `model` is already an :class:`ot.NumericalMathFunction`.
     """
 
     def __init__(self, wrapper, backend='multiprocessing', n_cpus=-1, verbosity=10):

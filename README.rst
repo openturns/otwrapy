@@ -3,13 +3,13 @@
 
 .. currentmodule:: otwrapy
 
-:code:`otwrapy` is a collection of tools that simplify the task of wrapping
+`otwrapy` is a collection of tools that simplify the task of wrapping
 external codes in a Python environment as well as parallelizing it. It is built
 on top of `OpenTURNS <http://www.openturns.org>`_, with its users as the target
 audience. Documentation is available
 `here <http://openturns.github.io/otwrapy/master>`_. The module provides :
 
-- A :code:`Parallelizer` class that converts any
+- A `Parallelizer` class that converts any
   `ot.NumericalMathFunction <http://doc.openturns.org/openturns-latest/sphinx/user_manual/_generated/openturns.NumericalMathFunction.html#openturns.NumericalMathFunction>`_
   into  a parallel wrapper using either
   `multiprocessing <https://docs.python.org/2/library/multiprocessing.html>`_,
@@ -19,20 +19,20 @@ audience. Documentation is available
 - A set of useful tools that simply recurrent tasks when writing code
   wrappers:
 
-  - :code:`TempWorkDir`: Context manager that gracefully creates a temporary
+  - `TempWorkDir`: Context manager that gracefully creates a temporary
     working directory. It handles errors and has the option to cleanup upon
     exit.
-  - :code:`Debug`: Decorator that protects the decorated function into a
+  - `Debug`: Decorator that protects the decorated function into a
     try/except structure so that errors are logged. It is specially useful
     when you launch your code in a non interactive environment.
-  - :code:`load_array` and :code:`dump_array`: Used for efficiently create
+  - `load_array` and `dump_array`: Used for efficiently create
     and load backups with the option to compress with gzip.
-  - :code:`safemakedirs`: Create a directory without raising an exception if
+  - `safemakedirs`: Create a directory without raising an exception if
     it exits.
-  - :code:`create_logger`: Return a logger with a FileHandler at a given
+  - `create_logger`: Return a logger with a FileHandler at a given
     logging level.
 
-:code:`otwrapy` comes from the experience of wrapping a lot of
+`otwrapy` comes from the experience of wrapping a lot of
 different external codes at `Phimeca engineering
 <http://www.phimeca.com>`_. We are a company specialized in
 uncertainty treatment and we assist our clients introducing the
