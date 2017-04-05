@@ -39,7 +39,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
 
     The wrapped code is an executable that is run from the shell as follows :
 
-    .. code-block:: shell
+    .. code-block:: sh
 
         $ beam -x beam.xml
 
