@@ -10,7 +10,7 @@ audience. Documentation is available
 `here <http://openturns.github.io/otwrapy/master>`_. The module provides :
 
 - A `Parallelizer` class that converts any
-  `ot.NumericalMathFunction <http://doc.openturns.org/openturns-latest/sphinx/user_manual/_generated/openturns.NumericalMathFunction.html#openturns.NumericalMathFunction>`_
+  `ot.Function <http://openturns.github.io/openturns/master/user_manual/_generated/openturns.Function.html>`_
   into  a parallel wrapper using either
   `multiprocessing <https://docs.python.org/2/library/multiprocessing.html>`_,
   `ipyparallel <http://ipyparallel.readthedocs.io/en/latest/>`_,

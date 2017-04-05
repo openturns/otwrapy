@@ -11,7 +11,7 @@ import openturns as ot
 import numpy as np
 import os
 
-sample_E = ot.NumericalSample.ImportFromCSVFile(
+sample_E = ot.Sample.ImportFromCSVFile(
     os.path.join(os.path.dirname(__file__), "sample_E.csv"))
 kernel_smoothing = ot.KernelSmoothing(ot.Normal())
 bandwidth = kernel_smoothing.computeSilvermanBandwidth(sample_E)

@@ -21,7 +21,7 @@ __version__ = "0.6"
 __email__ = "aguirre@phimeca.fr"
 __all__ = ['load_array', 'dump_array', '_exec_sample_joblib',
            '_exec_sample_multiprocessing', '_exec_sample_ipyparallel',
-           'NumericalMathFunctionDecorator', 'TempWorkDir', 'Parallelizer',
+           'FunctionDecorator', 'TempWorkDir', 'Parallelizer',
            'create_logger', 'Debug', 'safemakedirs']
 
 
@@ -53,7 +53,7 @@ def dump_array(array, filename, compress=False):
     Parameters
     ----------
     array : array
-        Array to be compressed. Typically a np.array or ot.NumericalSample.
+        Array to be compressed. Typically a np.array or ot.Sample.
     filename : str
         Path where the file is dumped. If the extension is '.pklz', it considers
         that the file has to be compressed with *gzip*.
@@ -177,25 +177,25 @@ class Debug(object):
         return func_debugged
 
 
-class NumericalMathFunctionDecorator(object):
+class FunctionDecorator(object):
 
-    """Convert an OpenTURNSPythonFunction into a NumericalMathFunction.
+    """Convert an OpenTURNSPythonFunction into a Function.
 
     This class is intended to be used as a decorator.
 
     Parameters
     ----------
     enableCache : bool (Optional)
-        If True, enable cache of the returned ot.NumericalMathFunction
+        If True, enable cache of the returned ot.Function
 
     Examples
     --------
-    In order to always get an ot.NumericalMathFunction when instantiating your
+    In order to always get an ot.Function when instantiating your
     wrapper, decorate it as follows:
 
     >>> import otwrapy as otw
     >>> import openturns as ot
-    >>> @otw.NumericalMathFunctionDecorator(enableCache=True)
+    >>> @otw.FunctionDecorator(enableCache=True)
     >>> class Wrapper(ot.OpenTURNSPythonFunction):
     >>>     pass
 
@@ -227,7 +227,7 @@ class NumericalMathFunctionDecorator(object):
     def __call__(self, wrapper):
         @wraps(wrapper)
         def numericalmathfunction(*args, **kwargs):
-            func = ot.NumericalMathFunction(wrapper(*args, **kwargs))
+            func = ot.Function(wrapper(*args, **kwargs))
             # Enable cache
             if self.enableCache:
                 func.enableCache()
@@ -350,7 +350,7 @@ def _exec_sample_joblib(func, n_cpus, verbosity):
     def _exec_sample(X):
         Y = Parallel(n_jobs=n_cpus, verbose=verbosity)(
             delayed(func)(x) for x in X)
-        return ot.NumericalSample(Y)
+        return ot.Sample(Y)
 
     return _exec_sample
 
@@ -377,7 +377,7 @@ def _exec_sample_multiprocessing(func, n_cpus):
         p = Pool(processes=n_cpus)
         rs = p.map_async(func, X)
         p.close()
-        return ot.NumericalSample(rs.get())
+        return ot.Sample(rs.get())
     return _exec_sample
 
 
@@ -416,7 +416,7 @@ def _exec_sample_pathos(func, n_cpus):
 
             rs = [item for sublist in rs for item in sublist]
 
-            return ot.NumericalSample(rs)
+            return ot.Sample(rs)
         except ValueError:
             # Get there if the chuck size left some single evaluations left
             return func(X)
@@ -450,7 +450,7 @@ def _exec_sample_ipyparallel(func, n, p):
                              p=func.getOutputDimension())
 
 
-@NumericalMathFunctionDecorator(enableCache=True)
+@FunctionDecorator(enableCache=True)
 class Parallelizer(ot.OpenTURNSPythonFunction):
 
     """Parallelize a Wrapper using 'ipyparallel', 'joblib', 'pathos' or 'multiprocessing'.
@@ -458,7 +458,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     Parameters
     ----------
 
-    wrapper : ot.NumericalMathFunction or instance of ot.OpenTURNSPythonFunction
+    wrapper : ot.Function or instance of ot.OpenTURNSPythonFunction
         openturns wrapper to be distributed
 
     backend : string (Optional)
@@ -484,8 +484,8 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     `model` will distribute calls to Wrapper() using multiprocessing and
     as many CPUs as you have minus one for the scheduler.
 
-    Because Parallelize is decorated with :class:`NumericalMathFunctionDecorator`,
-    `model` is already an :class:`ot.NumericalMathFunction`.
+    Because Parallelize is decorated with :class:`FunctionDecorator`,
+    `model` is already an :class:`ot.Function`.
     """
 
     def __init__(self, wrapper, backend='multiprocessing', n_cpus=-1, verbosity=10):

@@ -12,7 +12,7 @@ This is the user manual for the Python bindings to the `otwrapy` library.
     Parallelizer
     TempWorkDir
     Debug
-    NumericalMathFunctionDecorator
+    FunctionDecorator
     dump_array
     load_array
     safemakedirs
