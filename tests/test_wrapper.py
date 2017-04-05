@@ -17,7 +17,7 @@ def backendtest(backend):
     for size in sizes:
         X_sample = X_distribution.getSample(size)
         Y_ref = model(X_sample)
-        Y_sample = ot.NumericalSample(model_parallel(X_sample))
+        Y_sample = ot.Sample(model_parallel(X_sample))
         assert Y_ref == Y_sample, 'samples do not match'
 
 def test_joblib():

@@ -59,7 +59,7 @@ if __name__ == '__main__':
             print("Loaded a DOE of size {} from file: '{}'".format(X.getSize(),
                 args.X[0]))
         else:
-            X = ot.NumericalPoint([float(x) for x in args.X])
+            X = ot.Point([float(x) for x in args.X])
 
     if args.run:
         Y = model(X)

@@ -95,7 +95,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
 
         Parameters
         ----------
-        X : 1D array (e.g. ot.NumericalPoint or a 1D np.array)
+        X : 1D array (e.g. ot.Point or a 1D np.array)
             Input vector of size :math:`n` on which the model will be evaluated
 
         Returns
@@ -130,7 +130,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
 
         Parameters
         ----------
-        X : 1D array (e.g. ot.NumericalPoint or a 1D np.array)
+        X : 1D array (e.g. ot.Point or a 1D np.array)
             Input vector of size :math:`n` on which the model will be evaluated
         """
         ot.coupling_tools.replace(
@@ -230,7 +230,7 @@ if __name__ == '__main__':
             print("Loaded a DOE of size {} from file: '{}'".format(X.getSize(),
                 args.X[0]))
         else:
-            X = ot.NumericalPoint([float(x) for x in args.X])
+            X = ot.Point([float(x) for x in args.X])
 
 
     if args.run:
