@@ -6,7 +6,6 @@ install:
   - wget -c --no-check-certificate https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -P /tmp
   - bash /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda update -y python
   - conda install -y -c conda-forge openturns numpy sphinx nose numpydoc flake8 joblib ipyparallel pathos
 
 script:
