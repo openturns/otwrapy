@@ -38,7 +38,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'otwrapy'
-copyright = u'2016'
+copyright = u'2017 Phimeca'
 author = u'Felipe Aguirre Martinez'
 
 # List of patterns, relative to source directory, that match files and
