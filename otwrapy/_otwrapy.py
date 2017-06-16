@@ -318,6 +318,7 @@ class TempWorkDir(object):
         if self.transfer is not None:
             for file in self.transfer:
                 shutil.copy(file, self.dirname)
+        return self.dirname
 
     def __exit__(self, type, value, traceback):
         os.chdir(self.curdir)

@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/openturns/otwrapy.svg?branch=master
     :target: https://travis-ci.org/openturns/otwrapy
 
+.. image:: https://ci.appveyor.com/api/projects/status/f40xe7mrar1rbogi/branch/master?svg=true 
+    :target: https://ci.appveyor.com/project/openturns/otwrapy
+
 .. currentmodule:: otwrapy
 
 `otwrapy` is a collection of tools that simplify the task of wrapping
