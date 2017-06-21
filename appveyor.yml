@@ -1,0 +1,11 @@
+install:
+  - set PATH=%PATH%;C:\Miniconda36;C:\Miniconda36\Scripts
+  - conda install -y -c conda-forge openturns joblib ipyparallel pathos numpy nose
+
+build_script:
+  - nosetests --nocapture
+  # run tests with py2.7
+  - conda create -y -n py27 python=2.7
+  - activate py27
+  - conda install -y -c conda-forge openturns joblib ipyparallel pathos numpy nose
+  - nosetests --nocapture

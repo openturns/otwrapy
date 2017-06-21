@@ -14,6 +14,7 @@ import numpy as np
 from xml.dom import minidom
 import time
 import otwrapy as otw
+import openturns.coupling_tools as otct
 
 __author__ = "Felipe Aguirre Martinez"
 __copyright__ = "Copyright 2015, Phimeca Engineering"
@@ -67,8 +68,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         self.temp_work_dir = tmpdir
         self.input_template = os.path.join(self.base_dir,
             'beam_input_template.xml')
-        self.executable = os.path.join(self.base_dir,
-            'beam -x beam.xml')
+        self.executable = os.path.join(self.base_dir, 'beam -x beam.xml')
         self.sleep = sleep
 
         # Number of input/output values:
@@ -133,7 +133,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         X : 1D array (e.g. ot.Point or a 1D np.array)
             Input vector of size :math:`n` on which the model will be evaluated
         """
-        ot.coupling_tools.replace(
+        otct.replace(
             self.input_template,
             'beam.xml',
             ['@F','@E','@L','@I'],
@@ -149,7 +149,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         """
 
         time_start = time.time()
-        ot.coupling_tools.execute(self.executable)
+        otct.execute(self.executable, is_shell=True)
         time_stop = time.time()
 
         return time_stop - time_start
