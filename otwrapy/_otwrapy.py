@@ -122,17 +122,17 @@ class Debug(object):
 
     A decorator used to protect functions so that exceptions are logged to a
     file. It can either be instantiated with a Logger or with a filename for
-    which a logger will be created with a FileHandler. It comes specialy handy
-    when you launch your codes in a non interactive environement (e.g., HPC
+    which a logger will be created with a FileHandler. It comes specially handy
+    when you launch your codes in a non interactive environment (e.g., HPC
     cluster through submission scripts), given that Exceptions are captured
     and logged to a file.
 
     The great benefit of this implementation is that with a simple decorator
     you can protect the methods of your Wrapper class with a try/except
     structure. However, this might not be useful for a deeper debugging where
-    you want to have acces to the locals() of the place where the Exception
+    you want to have access to the locals() of the place where the Exception
     jumped. If you bump into such a case, add a try/except structure that
-    catches the Exception on the specific place. It is adviced to use the
+    catches the Exception on the specific place. It is advised to use the
     decorator once you have developed the wrapper and that you are ready to
     launch your uncertainty studies.
 
@@ -209,7 +209,7 @@ class FunctionDecorator(object):
     -----
     I wanted this decorator to work also with Wrapper class, but it only works
     with ParallelWrapper for the moment. The problem is that, apparently,
-    decorated classes are not pickable, and Wrapper instances must be pickable
+    decorated classes are not picklable, and Wrapper instances must be picklable
     so that they can be easily distributed with `multiprocessing`
 
     References
@@ -252,8 +252,8 @@ class TempWorkDir(object):
 
     """Implement a context manager that creates a temporary working directory.
 
-    Create a temporary working directory on `base_temp_work_dir` preceeded by
-    `prefix` and clean up at the exit if neccesary.
+    Create a temporary working directory on `base_temp_work_dir` preceded by
+    `prefix` and clean up at the exit if necessary.
     See: http://sametmax.com/les-context-managers-et-le-mot-cle-with-en-python/
 
     Parameters
@@ -271,7 +271,7 @@ class TempWorkDir(object):
         If True erase the directory and its children at the exit.
         Default = False
 
-    transer : list (optional)
+    transfer : list (optional)
         List of files to transfer to the temporary working directory
 
     Examples
@@ -279,8 +279,8 @@ class TempWorkDir(object):
     In the following example, everything that is executed inside the `with`
     environment will happen at a temporary working directory created at
     :file:`/tmp` with :file:`/run-` as a prefix. The created directory will be
-    erased upon the exit of the  `with` environement and python will go
-    back to the preceeding working directory, even if an Exception is raised.
+    erased upon the exit of the  `with` environment and python will go
+    back to the preceding working directory, even if an Exception is raised.
 
     >>> import otwrapy as otw
     >>> import os
@@ -331,7 +331,7 @@ def _exec_sample_joblib(func, n_cpus, verbosity):
 
     Parameters
     ----------
-    func : Function or calable
+    func : Function or callable
         A callable python object, usually a function. The function should take
         an input vector as argument and return an output vector.
 
@@ -341,7 +341,7 @@ def _exec_sample_joblib(func, n_cpus, verbosity):
     Returns
     -------
     _exec_sample : Function or callable
-        The parallelized funtion.
+        The parallelized function.
     """
     try:
         from joblib import Parallel, delayed
@@ -361,7 +361,7 @@ def _exec_sample_multiprocessing(func, n_cpus):
 
     Parameters
     ----------
-    func : Function or calable
+    func : Function or callable
         A callable python object, usually a function. The function should take
         an input vector as argument and return an output vector.
 
@@ -371,7 +371,7 @@ def _exec_sample_multiprocessing(func, n_cpus):
     Returns
     -------
     _exec_sample : Function or callable
-        The parallelized funtion.
+        The parallelized function.
     """
     def _exec_sample(X):
         from multiprocessing import Pool
@@ -387,7 +387,7 @@ def _exec_sample_pathos(func, n_cpus):
 
     Parameters
     ----------
-    func : Function or calable
+    func : Function or callable
         A callable python object, usually a function. The function should take
         an input vector as argument and return an output vector.
 
@@ -397,7 +397,7 @@ def _exec_sample_pathos(func, n_cpus):
     Returns
     -------
     _exec_sample : Function or callable
-        The parallelized funtion.
+        The parallelized function.
     """
     def _exec_sample(X):
         from pathos.multiprocessing import ProcessingPool
@@ -429,7 +429,7 @@ def _exec_sample_ipyparallel(func, n, p):
 
     Parameters
     ----------
-    func : Function or calable
+    func : Function or callable
         A callable python object, usually a function. The function should take
         an input vector as argument and return an output vector.
 
@@ -439,7 +439,7 @@ def _exec_sample_ipyparallel(func, n, p):
     Returns
     -------
     _exec_sample : Function or callable
-        The parallelized funtion.
+        The parallelized function.
     """
     import ipyparallel as ipp
 
