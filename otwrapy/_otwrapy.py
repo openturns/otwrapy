@@ -230,7 +230,8 @@ class FunctionDecorator(object):
             func = ot.Function(wrapper(*args, **kwargs))
             # Enable cache
             if self.enableCache:
-                func.enableCache()
+                func = ot.MemoizeFunction(func)
+                func.disableHistory()
 
             # Update __doc__ of the function
             if self.doc is None:
