@@ -15,7 +15,5 @@ __email__ = "aguirre@phimeca.fr"
 base_dir = os.path.dirname(__file__)
 
 from ._otwrapy import *
-from .examples import *
 
-__all__ = (_otwrapy.__all__ +
-           examples.__all__)
+__all__ = (_otwrapy.__all__)
