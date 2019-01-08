@@ -8,14 +8,12 @@ General purpose OpenTURNS python wrapper tools
 import os
 
 __author__ = "Felipe Aguirre Martinez"
-__copyright__ = "Copyright 2018 Phimeca Engineering"
-__version__ = "0.8"
+__copyright__ = "Copyright 2015-2019 Phimeca"
+__version__ = "0.9"
 __email__ = "aguirre@phimeca.fr"
 
 base_dir = os.path.dirname(__file__)
 
 from ._otwrapy import *
-from .examples import *
 
-__all__ = (_otwrapy.__all__ +
-           examples.__all__)
+__all__ = (_otwrapy.__all__)
