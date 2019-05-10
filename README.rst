@@ -44,6 +44,7 @@ probabilistic dimension in their so far deterministic studies.
 
 
 .. warning::
+
     While fully usable, otwrapy is still pre-1.0 software and has **no**
     backwards compatibility guarantees until the 1.0 release occurs! Please
     make sure to be careful **anytime you upgrade**!
