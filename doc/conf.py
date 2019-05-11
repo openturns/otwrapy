@@ -2,6 +2,8 @@
 
 import sys
 import os
+from distutils.version import LooseVersion
+import sphinx
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -15,11 +17,15 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosummary',
-    'sphinx.ext.mathjax',
     'numpydoc',
 ]
 
-autodoc_default_flags = ['members', 'inherited-members']
+if LooseVersion(sphinx.__version__) >= '1.8':
+    autodoc_default_options = {'members': None, 'inherited-members': None}
+else:
+    autodoc_default_flags =  ['members', 'inherited-members']
+
+
 intersphinx_mapping = {'openturns': ('http://openturns.github.io/openturns/latest/', None)}
 autosummary_generate = True
 
