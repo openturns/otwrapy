@@ -272,7 +272,7 @@ class TempWorkDir(object):
         Default = False
 
     transfer : list (optional)
-        List of files to transfer to the temporary working directory
+        List of files or folders to transfer to the temporary working directory
 
     Examples
     --------
@@ -308,6 +308,8 @@ class TempWorkDir(object):
 
     def __init__(self, base_temp_work_dir=None, prefix='run-', cleanup=False,
                  transfer=None):
+        if base_temp_work_dir is not None:
+            safemakedirs(base_temp_work_dir)
         self.dirname = mkdtemp(dir=base_temp_work_dir, prefix=prefix)
         self.cleanup = cleanup
         self.transfer = transfer
@@ -317,7 +319,16 @@ class TempWorkDir(object):
         os.chdir(self.dirname)
         if self.transfer is not None:
             for file in self.transfer:
-                shutil.copy(file, self.dirname)
+                if os.path.isfile(file):
+                    shutil.copy(file, self.dirname)
+                elif os.path.isdir(file):
+                    shutil.copytree(file, os.path.join(self.dirname,
+                                    file.split(os.sep)[-1]))
+                else:
+                    raise Exception('In otwrapy.TempWorkDir : the current ' + \
+                                    'path "{}" is not a file '.format(file) + \
+                                    'nor a directory to transfer.')
+
         return self.dirname
 
     def __exit__(self, type, value, traceback):
