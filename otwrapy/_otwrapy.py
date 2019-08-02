@@ -308,6 +308,8 @@ class TempWorkDir(object):
 
     def __init__(self, base_temp_work_dir=None, prefix='run-', cleanup=False,
                  transfer=None):
+        if base_temp_work_dir is not None:
+            safemakedirs(base_temp_work_dir)
         self.dirname = mkdtemp(dir=base_temp_work_dir, prefix=prefix)
         self.cleanup = cleanup
         self.transfer = transfer
