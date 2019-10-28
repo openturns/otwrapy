@@ -16,7 +16,7 @@ import openturns as ot
 import numpy as np
 
 __author__ = "Felipe Aguirre Martinez"
-__copyright__ = "Copyright 2017, Phimeca Engineering"
+__copyright__ = "Copyright 2015-2019 Phimeca"
 __email__ = "aguirre@phimeca.fr"
 __all__ = ['load_array', 'dump_array', '_exec_sample_joblib',
            '_exec_sample_multiprocessing', '_exec_sample_ipyparallel',

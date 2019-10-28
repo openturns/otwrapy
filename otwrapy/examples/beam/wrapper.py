@@ -17,7 +17,7 @@ import otwrapy as otw
 import openturns.coupling_tools as otct
 
 __author__ = "Felipe Aguirre Martinez"
-__copyright__ = "Copyright 2015, Phimeca Engineering"
+__copyright__ = "Copyright 2015-2019 Phimeca"
 __version__ = "0.2"
 __email__ = "aguirre@phimeca.fr"
 __all__ = ['Wrapper']
