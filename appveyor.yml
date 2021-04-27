@@ -4,7 +4,7 @@ install:
   - set CONDA_ROOT="%UserProfile%\Miniforge3"
   - Miniforge3-Windows-x86_64.exe /InstallationType=JustMe /S /D=%CONDA_ROOT%
   - call %CONDA_ROOT%\Scripts\activate.bat
-  - conda install -y -c conda-forge openturns joblib ipyparallel pathos numpy nose
+  - conda install -y -c conda-forge openturns joblib ipyparallel pathos numpy pytest
 
 build_script:
-  - nosetests --nocapture
+  - pytest -s

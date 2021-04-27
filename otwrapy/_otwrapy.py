@@ -539,18 +539,18 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
                 except (ipp.error.TimeoutError, IOError) as e:
                     ipy_backend = False
                     import logging
-                    logging.warn('Unable to connect to an ipython cluster.')
+                    logging.warning('Unable to connect to an ipython cluster.')
             except ImportError:
                 ipy_backend = False
                 import logging
-                logging.warn('ipyparallel package missing.')
+                logging.warning('ipyparallel package missing.')
 
             if ipy_backend:
                 self._exec_sample = _exec_sample_ipyparallel(self.wrapper,
                                                              self.getInputDimension(),
                                                              self.getOutputDimension())
             else:
-                logging.warn('Using multiprocessing backend instead')
+                logging.warning('Using multiprocessing backend instead')
                 self._exec_sample = _exec_sample_multiprocessing(self.wrapper,
                                                                  self.n_cpus)
 
@@ -566,14 +566,14 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
                 except ImportError:
                     joblib_backend = False
                     import logging
-                    logging.warn('joblib package missing.')
+                    logging.warning('joblib package missing.')
 
             if joblib_backend:
                 self._exec_sample = _exec_sample_joblib(self.wrapper,
                                                         self.n_cpus,
                                                         self.verbosity)
             else:
-                logging.warn('Using multiprocessing backend instead')
+                logging.warning('Using multiprocessing backend instead')
                 self._exec_sample = _exec_sample_multiprocessing(self.wrapper,
                                                                  self.n_cpus)
 
