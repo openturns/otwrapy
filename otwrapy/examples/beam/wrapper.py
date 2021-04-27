@@ -149,7 +149,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         """
 
         time_start = time.time()
-        otct.execute(self.executable, is_shell=True)
+        otct.execute(self.executable, shell=True)
         time_stop = time.time()
 
         return time_stop - time_start
