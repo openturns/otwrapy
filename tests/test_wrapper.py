@@ -13,7 +13,11 @@ def backendtest(backend):
     if n_cpu > 3:
         sizes.append(n_cpu - 2)
     model = Wrapper(sleep=0.2)
-    model_parallel = otw.Parallelizer(model, backend=backend)
+    if backend == 'dask':
+        dask_args = {'scheduler': 'localhost', 'workers': {'localhost': n_cpu}}
+    else:
+        dask_args = None
+    model_parallel = otw.Parallelizer(model, backend=backend, dask_args=dask_args)
     for size in sizes:
         X_sample = X_distribution.getSample(size)
         Y_ref = model(X_sample)
@@ -31,3 +35,6 @@ def test_ipython():
 
 def test_pathos():
     backendtest('pathos')
+
+def test_dask():
+    backendtest('dask')
