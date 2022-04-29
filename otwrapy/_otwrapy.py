@@ -20,6 +20,7 @@ __copyright__ = "Copyright 2015-2019 Phimeca"
 __email__ = "aguirre@phimeca.fr"
 __all__ = ['load_array', 'dump_array', '_exec_sample_joblib',
            '_exec_sample_multiprocessing', '_exec_sample_ipyparallel',
+           '_exec_sample_pathos', '_exec_sample_dask',
            'FunctionDecorator', 'TempWorkDir', 'Parallelizer',
            'create_logger', 'Debug', 'safemakedirs']
 
@@ -226,7 +227,8 @@ class FunctionDecorator(object):
     def __call__(self, wrapper):
         @wraps(wrapper)
         def numericalmathfunction(*args, **kwargs):
-            func = ot.Function(wrapper(*args, **kwargs))
+            wrapper_instance = wrapper(*args, **kwargs)
+            func = ot.Function(wrapper_instance)
             # Enable cache
             if self.enableCache:
                 func = ot.MemoizeFunction(func)
@@ -242,6 +244,7 @@ class FunctionDecorator(object):
             # Add the kwargs as attributes of the function for reference
             # purposes.
             func.__dict__.update(kwargs)
+            func.__dict__.update(wrapper_instance.__dict__)
             return func
         # Keep the wrapper class as reference
         numericalmathfunction.__wrapper__ = wrapper
@@ -462,6 +465,42 @@ def _exec_sample_ipyparallel(func, n, p):
                              p=func.getOutputDimension())
 
 
+def _exec_sample_dask(func, dask_args, verbosity):
+
+    from dask.distributed import Client, progress, SSHCluster
+
+    python_list = None
+    if 'remote_python' in dask_args.keys():
+        # start with python of the scheduler
+        python_list = [dask_args['remote_python'][dask_args['scheduler']]]
+
+    worker_list = []
+    for worker, n_cpus in dask_args['workers'].items():
+        worker_list.extend([worker] * n_cpus)
+
+        if python_list is not None:
+            # add python path of the workers
+            python_list.extend([dask_args['remote_python'][worker]] * n_cpus)
+
+    cluster = SSHCluster(
+        [dask_args['scheduler']] + worker_list,
+        connect_options={"known_hosts": None},
+        worker_options={"nthreads": 1, "n_workers": 1},
+        scheduler_options={"port": 0, "dashboard_address": ":8787"},
+        remote_python=python_list)
+
+    client = Client(cluster)
+
+    def _exec_sample(X):
+        map_eval = client.map(func, X)
+        if verbosity:
+            progress(map_eval)
+        result = client.submit(list, map_eval)
+        return ot.Sample(result.result())
+
+    return _exec_sample, cluster, client
+
+
 @FunctionDecorator(enableCache=True)
 class Parallelizer(ot.OpenTURNSPythonFunction):
 
@@ -482,7 +521,18 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         if using 'joblib', pathos or 'multiprocessing' as backend.
 
     verbosity : int (Optional)
-        verbose parameter when using 'joblib'. Default is 10.
+        verbose parameter when using 'joblib' or 'dask'. Default is 10. When 'dask' is used, 0
+        means no progress bar, whereas other value activate the progress bar. 
+
+    dask_args : dict (Optional)
+        Dictionnary parameters when using 'dask'. It must follow this form:
+        {'scheduler': ip adress or host name,
+         'workers': {'ip adress or host name': n_cpus},
+         'remote_python': {'ip adress or host name': path_to_bin_python}}.
+        The parallelization uses SSHCluster class of dask distributed with 1 thread per worker.
+        When dask is chosen, the argument n_cpus is not used. The progress bar is enabled if
+        verbosity != 0.
+        The dask dashboard is enabled at port 8787. 
 
     Examples
     --------
@@ -500,7 +550,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     `model` is already an :class:`ot.Function`.
     """
 
-    def __init__(self, wrapper, backend='multiprocessing', n_cpus=-1, verbosity=10):
+    def __init__(self, wrapper, backend='multiprocessing', n_cpus=-1, verbosity=10, dask_args=None):
 
         # -1 cpus means all available cpus - 1 for the scheduler
         if n_cpus == -1:
@@ -510,6 +560,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         self.n_cpus = n_cpus
         self.wrapper = wrapper
         self.verbosity = verbosity
+        self.dask_args = dask_args
         # This configures how to run single point simulations on the model:
         self._exec = self.wrapper
 
@@ -522,7 +573,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
 
         assert backend in ['ipython', 'ipyparallel',
                            'multiprocessing', 'pathos',
-                           'joblib'], "Unknown backend"
+                           'joblib', 'dask'], "Unknown backend"
 
         # This configures how to run samples on the model :
         if self.n_cpus == 1:
@@ -583,3 +634,19 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
 
         elif backend == 'pathos':
             self._exec_sample = _exec_sample_pathos(self.wrapper, self.n_cpus)
+
+        elif backend == 'dask':
+
+            assert 'scheduler' in self.dask_args, 'dask_args must have "scheduler" as key'
+            assert 'workers' in self.dask_args, 'dask_args must have "workers" as key'
+
+            self._exec_sample, self.dask_cluster, self.dask_client = _exec_sample_dask(
+                self.wrapper, self.dask_args, self.verbosity)
+
+            def close_dask():
+                from time import sleep
+                self.dask_client.close()
+                sleep(1)
+                self.dask_cluster.close()
+
+            self.close_dask = close_dask
