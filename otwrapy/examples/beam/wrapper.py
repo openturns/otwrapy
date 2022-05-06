@@ -6,7 +6,7 @@ General purpose OpenTURNS python wrapper
 """
 
 import openturns as ot
-ot.ResourceMap.SetAsUnsignedInteger('cache-max-size', int(1e6))
+ot.ResourceMap.SetAsUnsignedInteger('Cache-MaxSize', int(1e6))
 
 import gzip
 import os
