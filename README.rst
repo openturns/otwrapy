@@ -1,8 +1,5 @@
-.. image:: https://travis-ci.org/openturns/otwrapy.svg?branch=master
-    :target: https://travis-ci.org/openturns/otwrapy
-
-.. image:: https://ci.appveyor.com/api/projects/status/f40xe7mrar1rbogi/branch/master?svg=true 
-    :target: https://ci.appveyor.com/project/openturns/otwrapy
+.. image:: https://github.com/openturns/otwrapy/actions/workflows/build.yml/badge.svg?branch=master
+    :target: https://github.com/openturns/otwrapy/actions/workflows/build.yml
 
 .. currentmodule:: otwrapy
 
