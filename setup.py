@@ -29,7 +29,7 @@ setup(
         'joblib':  ["joblib>=0.9.3"],
         'ipyparallel': ["ipyparallel>=5.0.1"],
         'pathos': ["pathos>=0.2.0"],
-        'dask': ["dask>=2021.01.0", "asyncssh"]
+        'dask': ["dask>=2020.01.0", "asyncssh"]
     },
     author="Felipe Aguirre Martinez",
     author_email="aguirre@phimeca.com",

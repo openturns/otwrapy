@@ -11,7 +11,7 @@ jobs:
       - name: Build
         shell: bash -l {0}
         run: |
-          conda install -y openturns numpy sphinx pytest numpydoc flake8 joblib ipyparallel pathos "dask<2022" asyncssh
+          conda install -y openturns numpy sphinx pytest numpydoc flake8 joblib ipyparallel pathos "dask<2021" asyncssh
           python setup.py install
           pytest -s
           pushd doc && make html BUILDDIR=~/.local/share/otwrapy/doc && popd
@@ -39,6 +39,6 @@ jobs:
           miniforge-version: latest
       - name: Build
         run: |
-          conda install -y openturns joblib ipyparallel pathos "dask<2022" asyncssh numpy pytest
+          conda install -y openturns joblib ipyparallel pathos "dask<2021" asyncssh numpy pytest
           pytest -s
 
