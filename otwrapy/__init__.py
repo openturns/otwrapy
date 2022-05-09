@@ -8,8 +8,8 @@ General purpose OpenTURNS python wrapper tools
 import os
 
 __author__ = "Felipe Aguirre Martinez"
-__copyright__ = "Copyright 2015-2021 Phimeca"
-__version__ = "0.10"
+__copyright__ = "Copyright 2015-2022 Phimeca"
+__version__ = "0.11"
 __email__ = "aguirre@phimeca.fr"
 
 base_dir = os.path.dirname(__file__)
