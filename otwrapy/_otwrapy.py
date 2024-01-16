@@ -12,6 +12,7 @@ import importlib
 import logging
 import openturns as ot
 import numpy as np
+from tqdm import tqdm
 
 __author__ = "Felipe Aguirre Martinez"
 __copyright__ = "Copyright 2015-2019 Phimeca"
@@ -338,6 +339,36 @@ class TempWorkDir(object):
             shutil.rmtree(self.dirname)
 
 
+def _exec_sample_serial(func, verbosity):
+    """Return a function that evaluate the sample and provide a progress bar.
+
+    Parameters
+    ----------
+    func : Function or callable
+        A callable python object, usually a function. The function should take
+        an input vector as argument and return an output vector.
+    verbosity : int
+        If value greater than 0, the progress bar is displayed.
+
+    Returns
+    -------
+    _exec_sample : Function or callable
+        The function with the progress bar.
+    """
+
+    def _exec_sample(X):
+        X = ot.Sample(X)
+        if verbosity > 0 and X.getSize() > 1:
+            Y = ot.Sample(0, func.getOutputDimension())
+            for x in tqdm(X):
+                Y.add(func(x))
+        else:
+            Y = func(X)
+        return ot.Sample(Y)
+
+    return _exec_sample
+
+
 def _exec_sample_joblib(func, n_cpus, verbosity):
     """Return a function that executes a sample in parallel using joblib.
 
@@ -508,15 +539,17 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         openturns wrapper to be distributed
 
     backend : string (Optional)
-        Whether to parallelize using 'ipyparallel', 'joblib', pathos, or
-        'multiprocessing'.
+        Whether to parallelize using 'ipyparallel', 'joblib', 'pathos', 'multiprocessing' or
+        'serial'. Serial backend means unit evaluation, with a progress bar if verbosity > 0.
 
     n_cpus : int (Optional)
         Number of CPUs on which the simulations will be distributed. Needed Only
         if using 'joblib', pathos or 'multiprocessing' as backend.
+        If n_cpus = 1, the behavior is the same as 'serial'.
 
     verbosity : int (Optional)
-        verbose parameter when using 'joblib' or 'dask'. Default is 10.
+        verbose parameter when using 'joblib', 'dask' or without parallelization. Default is 10.
+        For 'serial', if verbosity > 0, a progress bar is displayed using tqdm module.
         When 'dask' is used, 0 means no progress bar, whereas other value activate the progress bar.
 
     dask_args : dict (Optional)
@@ -566,13 +599,13 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         self.setInputDescription(self.wrapper.getInputDescription())
         self.setOutputDescription(self.wrapper.getOutputDescription())
 
-        assert backend in ['ipython', 'ipyparallel',
+        assert backend in ['serial', 'ipython', 'ipyparallel',
                            'multiprocessing', 'pathos',
                            'joblib', 'dask'], "Unknown backend"
 
         # This configures how to run samples on the model :
-        if self.n_cpus == 1:
-            self._exec_sample = self.wrapper
+        if backend == 'serial' or self.n_cpus == 1:
+            self._exec_sample = _exec_sample_serial(self.wrapper, verbosity)
 
         elif (backend == 'ipython') or (backend == 'ipyparallel'):
             # Check that ipyparallel is installed

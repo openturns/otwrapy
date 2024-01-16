@@ -17,12 +17,15 @@ def backendtest(backend):
         dask_args = {'scheduler': 'localhost', 'workers': {'localhost': n_cpu}}
     else:
         dask_args = None
-    model_parallel = otw.Parallelizer(model, backend=backend, dask_args=dask_args)
+    model_parallel = otw.Parallelizer(model, backend=backend, n_cpus=n_cpu, dask_args=dask_args)
     for size in sizes:
         X_sample = X_distribution.getSample(size)
         Y_ref = model(X_sample)
         Y_sample = ot.Sample(model_parallel(X_sample))
         assert Y_ref == Y_sample, 'samples do not match'
+
+def test_serial():
+    backendtest('serial')
 
 def test_joblib():
     backendtest('joblib')
