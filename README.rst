@@ -9,6 +9,7 @@ on top of `OpenTURNS <http://www.openturns.org>`_, with its users as the target
 audience. Documentation is available
 `here <http://openturns.github.io/otwrapy/master>`_. The module provides :
 
+- An integrated progress bar for unit evaluation of a sample without parallelization.
 - A `Parallelizer` class that converts any
   `ot.Function <http://openturns.github.io/openturns/master/user_manual/_generated/openturns.Function.html>`_
   into  a parallel wrapper using either

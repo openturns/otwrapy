@@ -25,11 +25,12 @@ setup(
     name='otwrapy',
     version=version,
     packages=find_packages(),
-    extras_require = {
+    extras_require={
         'joblib':  ["joblib>=0.9.3"],
         'ipyparallel': ["ipyparallel>=5.0.1"],
         'pathos': ["pathos>=0.2.0"],
-        'dask': ["dask>=2021.01.0", "asyncssh"]
+        'dask': ["dask>=2021.01.0", "asyncssh"],
+        'tqdm': ["tqdm>=4.0.0"]
     },
     author="Felipe Aguirre Martinez",
     author_email="aguirre@phimeca.com",
@@ -37,8 +38,8 @@ setup(
     long_description=long_description,
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
-    include_package_data = True,
-    package_data = {'otwrapy': ['examples/beam/*']},
+    include_package_data=True,
+    package_data={'otwrapy': ['examples/beam/*']},
     scripts=['otwrapy/examples/beam/beam_wrapper'],
     zip_safe=False
 )
