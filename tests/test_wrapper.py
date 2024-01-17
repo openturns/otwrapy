@@ -1,8 +1,8 @@
-from __future__ import print_function
 from otwrapy.examples.beam import Wrapper, X_distribution
 import otwrapy as otw
 import openturns as ot
 import multiprocessing
+import pytest
 
 def backendtest(backend):
     ot.RandomGenerator.SetSeed(0)
@@ -36,5 +36,6 @@ def test_ipython():
 def test_pathos():
     backendtest('pathos')
 
+@pytest.mark.skip(reason="needs passwordless ssh configuration")
 def test_dask():
     backendtest('dask')
