@@ -5,21 +5,20 @@ General purpose OpenTURNS python wrapper
 """
 
 import openturns as ot
-ot.ResourceMap.SetAsUnsignedInteger('Cache-MaxSize', int(1e6))
-
-import gzip
 import os
-import numpy as np
 from xml.dom import minidom
 import time
 import otwrapy as otw
 import openturns.coupling_tools as otct
+
+ot.ResourceMap.SetAsUnsignedInteger('Cache-MaxSize', int(1e6))
 
 __author__ = "Felipe Aguirre Martinez"
 __copyright__ = "Copyright 2015-2019 Phimeca"
 __version__ = "0.2"
 __email__ = "aguirre@phimeca.fr"
 __all__ = ['Wrapper']
+
 
 class Wrapper(ot.OpenTURNSPythonFunction):
     """Wrapper of a C++ code that computes the deviation of a beam.
@@ -66,7 +65,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         self.base_dir = os.path.abspath(os.path.dirname(__file__))
         self.temp_work_dir = tmpdir
         self.input_template = os.path.join(self.base_dir,
-            'beam_input_template.xml')
+                                           'beam_input_template.xml')
         self.executable = os.path.join(self.base_dir, 'beam -x beam.xml')
         self.sleep = sleep
 
@@ -75,7 +74,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         self.setInputDescription(['Load', 'Young modulus', 'Length', 'Inertia'])
         self.setOutputDescription(['deviation'])
 
-    #@otw.Debug('wrapper.log')
+    # @otw.Debug('wrapper.log')
     def _exec(self, X):
         """Run the model in the shell for a given point :math:`X`.
 
@@ -113,7 +112,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
             self._create_input_file(X)
 
             # Execute code
-            runtime = self._call()
+            _ = self._call()
 
             # Retrieve output (see also ot.coupling_tools.get_value)
             Y = self._parse_output()
@@ -135,7 +134,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         otct.replace(
             self.input_template,
             'beam.xml',
-            ['@F','@E','@L','@I'],
+            ['@F', '@E', '@L', '@I'],
             X)
 
     def _call(self):
@@ -152,7 +151,6 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         time_stop = time.time()
 
         return time_stop - time_start
-
 
     def _parse_output(self):
         """Parse the XML output given by the code and get the value of deviation
@@ -183,36 +181,36 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('-tmp', default=None, type=str,
-        help='Root directory on which temporary working directories will be' +
-             'created for each independent simulation.')
+                        help='Root directory on which temporary working directories will be'
+                        + 'created for each independent simulation.')
 
     parser.add_argument('-seed', default=int(0), type=int,
-        help='Seed number for the random number generator')
+                        help='Seed number for the random number generator')
 
     parser.add_argument('-MonteCarlo', nargs=1,
-        help="Launch a MonteCarlo simulation of given size")
+                        help="Launch a MonteCarlo simulation of given size")
 
     parser.add_argument('-X', nargs='*',
-        help='List of floats [X1, X2.. Xp] or PATH to a pickled DOE')
+                        help='List of floats [X1, X2.. Xp] or PATH to a pickled DOE')
 
     parser.add_argument('-n_cpus', default=-1, type=int,
-        help="(Optional) number of cpus to use.")
+                        help="(Optional) number of cpus to use.")
 
     parser.add_argument('-backend', default='joblib', type=str,
-        choices=['joblib', 'multiprocessing', 'ipyparallel'],
-        help="Whether to parallelize using 'joblib' or 'multiprocessing'.")
+                        choices=['joblib', 'multiprocessing', 'ipyparallel'],
+                        help="Whether to parallelize using 'joblib' or 'multiprocessing'.")
 
     parser.add_argument('-run', default=False, type=bool, nargs='?',
-        const='True', help='If True, run the model', choices=[True, False])
+                        const='True', help='If True, run the model', choices=[True, False])
 
     parser.add_argument('-dump', default=False, type=bool, nargs='?',
-        const='True', choices=[True, False],
-        help='If True, dump the output for later posttreatment')
+                        const='True', choices=[True, False],
+                        help='If True, dump the output for later posttreatment')
 
     args = parser.parse_args()
 
     model = otw.Parallelizer(Wrapper(tmpdir=args.tmp, sleep=1),
-        backend=args.backend, n_cpus=args.n_cpus)
+                             backend=args.backend, n_cpus=args.n_cpus)
 
     print("The wrapper has been instantiated as 'model'.")
 
@@ -227,10 +225,9 @@ if __name__ == '__main__':
         if isinstance(args.X[0], str) and os.path.isfile(args.X[0]):
             X = otw.load_array(args.X[0])
             print("Loaded a DOE of size {} from file: '{}'".format(X.getSize(),
-                args.X[0]))
+                  args.X[0]))
         else:
             X = ot.Point([float(x) for x in args.X])
-
 
     if args.run:
         Y = model(X)
@@ -242,5 +239,3 @@ if __name__ == '__main__':
             print("Finished evaluationg the model. Take a look at 'Y' variable.")
     elif (args.MonteCarlo is not None) or (args.X is not None):
         print("The desired input is ready to be run using --> 'Y = model(X)'")
-
-

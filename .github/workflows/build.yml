@@ -4,7 +4,7 @@ jobs:
   conda-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniforge-version: latest
@@ -12,9 +12,9 @@ jobs:
         shell: bash -l {0}
         run: |
           conda install -y openturns numpy sphinx pytest numpydoc flake8 joblib ipyparallel pathos dask asyncssh
-          python setup.py install
+          pip install .
           pytest -s
-          pushd doc && make html BUILDDIR=~/.local/share/otwrapy/doc && popd
+          make html -C doc BUILDDIR=~/.local/share/otwrapy/doc
       - name: Upload
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
@@ -33,7 +33,7 @@ jobs:
   conda-windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniforge-version: latest
