@@ -8,6 +8,7 @@ import pickle
 from tempfile import mkdtemp
 import shutil
 from functools import wraps
+import importlib
 import logging
 import openturns as ot
 import numpy as np
@@ -325,9 +326,9 @@ class TempWorkDir(object):
                     shutil.copytree(file, os.path.join(self.dirname,
                                     file.split(os.sep)[-1]))
                 else:
-                    raise Exception('In otwrapy.TempWorkDir : the current ' + \
-                                    'path "{}" is not a file '.format(file) + \
-                                    'nor a directory to transfer.')
+                    raise Exception('In otwrapy.TempWorkDir : the current '
+                                    + 'path "{}" is not a file '.format(file)
+                                    + 'nor a directory to transfer.')
 
         return self.dirname
 
@@ -354,10 +355,7 @@ def _exec_sample_joblib(func, n_cpus, verbosity):
     _exec_sample : Function or callable
         The parallelized function.
     """
-    try:
-        from joblib import Parallel, delayed
-    except ImportError:
-        from sklearn.externals.joblib import Parallel, delayed
+    from joblib import Parallel, delayed
 
     def _exec_sample(X):
         Y = Parallel(n_jobs=n_cpus, verbose=verbosity)(
@@ -518,8 +516,8 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         if using 'joblib', pathos or 'multiprocessing' as backend.
 
     verbosity : int (Optional)
-        verbose parameter when using 'joblib' or 'dask'. Default is 10. When 'dask' is used, 0
-        means no progress bar, whereas other value activate the progress bar. 
+        verbose parameter when using 'joblib' or 'dask'. Default is 10.
+        When 'dask' is used, 0 means no progress bar, whereas other value activate the progress bar.
 
     dask_args : dict (Optional)
         Dictionnary parameters when using 'dask'. It must follow this form:
@@ -529,7 +527,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         The parallelization uses SSHCluster class of dask distributed with 1 thread per worker.
         When dask is chosen, the argument n_cpus is not used. The progress bar is enabled if
         verbosity != 0.
-        The dask dashboard is enabled at port 8787. 
+        The dask dashboard is enabled at port 8787.
 
     Examples
     --------
@@ -582,15 +580,13 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
                 import ipyparallel as ipp
                 # If it is, see if there is a cluster running
                 try:
-                    rc = ipp.Client()
+                    _ = ipp.Client()
                     ipy_backend = True
-                except (ipp.error.TimeoutError, IOError) as e:
+                except (ipp.error.TimeoutError, IOError):
                     ipy_backend = False
-                    import logging
                     logging.warning('Unable to connect to an ipython cluster.')
             except ImportError:
                 ipy_backend = False
-                import logging
                 logging.warning('ipyparallel package missing.')
 
             if ipy_backend:
@@ -605,16 +601,11 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         elif backend == 'joblib':
             # Check that joblib is installed
             try:
-                import joblib
+                importlib.import_module("joblib")
                 joblib_backend = True
             except ImportError:
-                try:
-                    from sklearn.externals import joblib
-                    joblib_backend = True
-                except ImportError:
-                    joblib_backend = False
-                    import logging
-                    logging.warning('joblib package missing.')
+                joblib_backend = False
+                logging.warning('joblib package missing.')
 
             if joblib_backend:
                 self._exec_sample = _exec_sample_joblib(self.wrapper,

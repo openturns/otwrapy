@@ -2,6 +2,8 @@
 General purpose OpenTURNS python wrapper tools
 """
 
+# flake8: noqa
+
 import os
 
 __author__ = "Felipe Aguirre Martinez"

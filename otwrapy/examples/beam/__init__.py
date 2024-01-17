@@ -1,3 +1,5 @@
+# flake8: noqa
+
 from .wrapper import *
 from ._probability_model import *
 

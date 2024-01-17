@@ -7,7 +7,6 @@ General purpose OpenTURNS python wrapper
 __all__ = ['X_distribution']
 
 import openturns as ot
-import numpy as np
 import os
 
 sample_E = ot.Sample.ImportFromCSVFile(
@@ -23,10 +22,10 @@ F.setDescription(['Load'])
 L = ot.Uniform(250, 260)
 L.setDescription(['Length'])
 
-I = ot.Beta(2.5, 4, 310, 450)
-I.setDescription(['Inertia'])
+II = ot.Beta(2.5, 4, 310, 450)
+II.setDescription(['Inertia'])
 
-marginal_distributions = [F, E, L, I]
+marginal_distributions = [F, E, L, II]
 
 SR_cor = ot.CorrelationMatrix(len(marginal_distributions))
 SR_cor[2, 3] = -0.2
