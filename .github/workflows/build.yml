@@ -11,11 +11,11 @@ jobs:
       - name: Build
         shell: bash -l {0}
         run: |
-          conda install -y openturns numpy sphinx pytest numpydoc flake8 joblib ipyparallel pathos dask asyncssh
+          conda install -y openturns numpy pytest joblib ipyparallel pathos dask asyncssh sphinx numpydoc build twine
           pip install .
           pytest -s
           make html -C doc BUILDDIR=~/.local/share/otwrapy/doc
-      - name: Upload
+      - name: Upload doc
         if: ${{ github.ref == 'refs/heads/master' }}
         run: |
           git clone --depth 1 https://${{ secrets.GH_TOKEN }}@github.com/openturns/openturns.github.io.git /tmp/io
@@ -29,6 +29,15 @@ jobs:
           if test `git diff HEAD | wc -c` -eq 0; then exit 0; fi
           git commit -a -m "GitHub Actions build ${GITHUB_REPOSITORY} ${GITHUB_RUN_ID}"
           git push --quiet origin master > /dev/null 2>&1
+      - name: Upload PyPI
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash -l {0}
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+        run: |
+          python -m build
+          twine upload --non-interactive dist/*.whl
 
   conda-windows:
     runs-on: windows-latest
