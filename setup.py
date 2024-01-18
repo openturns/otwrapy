@@ -29,9 +29,9 @@ setup(
         'joblib':  ["joblib>=0.9.3"],
         'ipyparallel': ["ipyparallel>=5.0.1"],
         'pathos': ["pathos>=0.2.0"],
-        'dask': ["dask>=2021.01.0", "asyncssh"],
-        'tqdm': ["tqdm>=4.0.0"]
+        'dask': ["dask>=2021.01.0", "asyncssh"]
     },
+    install_requires=["tqdm>=4.0.0"],
     author="Felipe Aguirre Martinez",
     author_email="aguirre@phimeca.com",
     description="General purpose OpenTURNS python wrapper tools",
