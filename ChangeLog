@@ -1,3 +1,7 @@
+= 0.12 release (2024-01-18)
+
+ * Serial backend with progress bar
+
 = 0.11 release (2022-05-09)
 
  * New dask backend
