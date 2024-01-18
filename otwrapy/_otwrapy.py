@@ -555,8 +555,8 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     dask_args : dict (Optional)
         Dictionnary parameters when using 'dask'. It must follow this form:
         {'scheduler': ip adress or host name,
-         'workers': {'ip adress or host name': n_cpus},
-         'remote_python': {'ip adress or host name': path_to_bin_python}}.
+        'workers': {'ip adress or host name': n_cpus},
+        'remote_python': {'ip adress or host name': path_to_bin_python}}.
         The parallelization uses SSHCluster class of dask distributed with 1 thread per worker.
         When dask is chosen, the argument n_cpus is not used. The progress bar is enabled if
         verbosity != 0.

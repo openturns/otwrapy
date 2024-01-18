@@ -1,8 +1,6 @@
 .. image:: https://github.com/openturns/otwrapy/actions/workflows/build.yml/badge.svg?branch=master
     :target: https://github.com/openturns/otwrapy/actions/workflows/build.yml
 
-.. currentmodule:: otwrapy
-
 `otwrapy` is a collection of tools that simplify the task of wrapping
 external codes in a Python environment as well as parallelizing it. It is built
 on top of `OpenTURNS <http://www.openturns.org>`_, with its users as the target
