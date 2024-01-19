@@ -13,10 +13,6 @@ import openturns.coupling_tools as otct
 
 ot.ResourceMap.SetAsUnsignedInteger('Cache-MaxSize', int(1e6))
 
-__author__ = "Felipe Aguirre Martinez"
-__copyright__ = "Copyright 2015-2019 Phimeca"
-__version__ = "0.2"
-__email__ = "aguirre@phimeca.fr"
 __all__ = ['Wrapper']
 
 

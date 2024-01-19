@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from setuptools import setup, find_packages
- # To use a consistent encoding
+# To use a consistent encoding
 from codecs import open
 from os import path
 
@@ -26,14 +25,13 @@ setup(
     version=version,
     packages=find_packages(),
     extras_require={
-        'joblib':  ["joblib>=0.9.3"],
+        'joblib': ["joblib>=0.9.3"],
         'ipyparallel': ["ipyparallel>=5.0.1"],
         'pathos': ["pathos>=0.2.0"],
         'dask': ["dask>=2021.01.0", "asyncssh"]
     },
     install_requires=["tqdm>=4.0.0"],
-    author="Felipe Aguirre Martinez",
-    author_email="aguirre@phimeca.com",
+    author="Phimeca",
     description="General purpose OpenTURNS python wrapper tools",
     long_description=long_description,
     setup_requires=['pytest-runner'],

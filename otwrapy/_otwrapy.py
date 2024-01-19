@@ -14,9 +14,6 @@ import openturns as ot
 import numpy as np
 from tqdm import tqdm
 
-__author__ = "Felipe Aguirre Martinez"
-__copyright__ = "Copyright 2015-2019 Phimeca"
-__email__ = "aguirre@phimeca.fr"
 __all__ = ['load_array', 'dump_array', '_exec_sample_joblib',
            '_exec_sample_multiprocessing', '_exec_sample_ipyparallel',
            '_exec_sample_pathos', '_exec_sample_dask',
