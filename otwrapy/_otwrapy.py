@@ -563,7 +563,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         openturns wrapper to be distributed
 
     backend : string (Optional)
-        Whether to parallelize using 'ipyparallel', 'joblib', 'pathos', 'multiprocessing' or
+        Whether to parallelize using 'ipyparallel', 'joblib', 'pathos', 'multiprocessing', 'dask' or
         'serial'. Serial backend means unit evaluation, with a progress bar if verbosity is True.
 
     n_cpus : int (Optional)
