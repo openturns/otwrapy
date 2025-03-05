@@ -28,7 +28,7 @@ setup(
         'joblib': ["joblib>=0.9.3"],
         'ipyparallel': ["ipyparallel>=5.0.1"],
         'pathos': ["pathos>=0.2.0"],
-        'dask': ["dask>=2021.01.0", "asyncssh"]
+        'dask': ["dask>=2021.01.0", "asyncssh", "dask-jobqueue>=0.8"],
     },
     install_requires=["tqdm>=4.0.0"],
     author="Phimeca",
