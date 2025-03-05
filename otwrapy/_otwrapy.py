@@ -488,7 +488,7 @@ def _exec_sample_pathos(func, n_cpus):
     return _exec_sample
 
 
-def _exec_sample_ipyparallel(func, n, p):
+def _exec_sample_ipyparallel(func):
     """Return a function that executes a sample in parallel using ipyparallel.
 
     Parameters
@@ -509,10 +509,7 @@ def _exec_sample_ipyparallel(func, n, p):
 
     rc = ipp.Client()
 
-    return ot.PythonFunction(func_sample=lambda X:
-                             rc[:].map_sync(func, X),
-                             n=func.getInputDimension(),
-                             p=func.getOutputDimension())
+    return lambda X: rc[:].map_sync(func, X)
 
 
 def _exec_sample_dask(func, dask_args, verbosity):
@@ -649,9 +646,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
                 logging.warning('ipyparallel package missing.')
 
             if ipy_backend:
-                self._exec_sample = _exec_sample_ipyparallel(self.wrapper,
-                                                             self.getInputDimension(),
-                                                             self.getOutputDimension())
+                self._exec_sample = _exec_sample_ipyparallel(self.wrapper)
             else:
                 logging.warning('Using multiprocessing backend instead')
                 self._exec_sample = _exec_sample_multiprocessing(self.wrapper,
