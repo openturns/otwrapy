@@ -549,12 +549,12 @@ def _exec_sample_dask_ssh(func, dask_args, verbosity):
     return _exec_sample, cluster, client
 
 
-def _exec_sample_dask_slurm(func, n_cpus, slurmcluster_kwargs, verbosity):
+def _exec_sample_dask_slurm(func, n_cpus, slurmcluster_kw, verbosity):
     from dask.distributed import Client, progress
     from dask_jobqueue import SLURMCluster
 
     # https://jobqueue.dask.org/en/latest/generated/dask_jobqueue.SLURMCluster.html
-    cluster = SLURMCluster(**slurmcluster_kwargs)
+    cluster = SLURMCluster(**slurmcluster_kw)
 
     # https://docs.dask.org/en/latest/futures.html#distributed.Client
     client = Client(cluster)
@@ -606,7 +606,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         verbosity is True.
         The dask dashboard is enabled at port 8787.
 
-    dask_slurmcluster_kwargs : dict, optional
+    dask_slurmcluster_kw : dict, optional
         Parameters to instantiate the Dask SLURMCluster object.
         The argument n_cpus is used to set the default number of workers (n_workers).
 
@@ -627,7 +627,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     """
 
     def __init__(self, wrapper, backend='multiprocessing', n_cpus=-1, verbosity=True,
-                 dask_args=None, dask_slurmcluster_kwargs={}):
+                 dask_args=None, dask_slurmcluster_kw={}):
 
         # -1 cpus means all available cpus - 1 for the scheduler
         if n_cpus == -1:
@@ -726,11 +726,11 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
 
         elif backend == "dask/slurm":
 
-            slurmcluster_kwargs = dict(dask_slurmcluster_kwargs)
-            slurmcluster_kwargs.setdefault("n_workers", n_cpus)
-            slurmcluster_kwargs.setdefault("cores", 1)
-            slurmcluster_kwargs.setdefault("memory", "512 MB")
-            slurmcluster_kwargs.setdefault("death_timeout", 300)
-            slurmcluster_kwargs.setdefault("log_directory", "logs")
+            slurmcluster_kw = dict(dask_slurmcluster_kw)
+            slurmcluster_kw.setdefault("n_workers", n_cpus)
+            slurmcluster_kw.setdefault("cores", 1)
+            slurmcluster_kw.setdefault("memory", "512 MB")
+            slurmcluster_kw.setdefault("death_timeout", 300)
+            slurmcluster_kw.setdefault("log_directory", "logs")
             self._exec_sample, self.dask_cluster, self.dask_client = _exec_sample_dask_slurm(
-                self.wrapper, n_cpus, slurmcluster_kwargs, self.verbosity)
+                self.wrapper, n_cpus, slurmcluster_kw, self.verbosity)
