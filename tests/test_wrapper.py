@@ -49,4 +49,4 @@ def test_pathos():
 
 @pytest.mark.skip(reason="needs passwordless ssh configuration")
 def test_dask():
-    backendtest('dask')
+    backendtest('dask/ssh')

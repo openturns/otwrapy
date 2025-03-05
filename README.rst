@@ -14,8 +14,9 @@ audience. Documentation is available
   `multiprocessing <https://docs.python.org/2/library/multiprocessing.html>`_,
   `ipyparallel <http://ipyparallel.readthedocs.io/en/latest/>`_,
   `joblib <https://pythonhosted.org/joblib/>`_,
-  `pathos <https://pypi.python.org/pypi/pathos>`_ or
-  `dask SSHCluster <https://docs.dask.org/en/latest/deploying-ssh.html>`_.
+  `pathos <https://pypi.python.org/pypi/pathos>`_,
+  `dask SSHCluster <https://docs.dask.org/en/latest/deploying-ssh.html>`_ or
+  `dask_jobqueue SLURMCluster <https://jobqueue.dask.org/en/latest/generated/dask_jobqueue.SLURMCluster.html>`_.
 - A set of useful tools that simply recurrent tasks when writing code
   wrappers:
 

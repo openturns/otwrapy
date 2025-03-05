@@ -10,13 +10,14 @@ import shutil
 from functools import wraps
 import importlib
 import logging
+import warnings
 import openturns as ot
 import numpy as np
 from tqdm import tqdm
 
 __all__ = ['load_array', 'dump_array', '_exec_sample_joblib',
            '_exec_sample_multiprocessing', '_exec_sample_ipyparallel',
-           '_exec_sample_pathos', '_exec_sample_dask',
+           '_exec_sample_pathos', '_exec_sample_dask_ssh', '_exec_sample_dask_slurm',
            'FunctionDecorator', 'TempWorkDir', 'Parallelizer',
            'create_logger', 'Debug', 'safemakedirs']
 
@@ -512,7 +513,7 @@ def _exec_sample_ipyparallel(func):
     return lambda X: rc[:].map_sync(func, X)
 
 
-def _exec_sample_dask(func, dask_args, verbosity):
+def _exec_sample_dask_ssh(func, dask_args, verbosity):
 
     from dask.distributed import Client, progress, SSHCluster
 
@@ -548,6 +549,26 @@ def _exec_sample_dask(func, dask_args, verbosity):
     return _exec_sample, cluster, client
 
 
+def _exec_sample_dask_slurm(func, n_cpus, slurmcluster_kwargs, verbosity):
+    from dask.distributed import Client, progress
+    from dask_jobqueue import SLURMCluster
+
+    # https://jobqueue.dask.org/en/latest/generated/dask_jobqueue.SLURMCluster.html
+    cluster = SLURMCluster(**slurmcluster_kwargs)
+
+    # https://docs.dask.org/en/latest/futures.html#distributed.Client
+    client = Client(cluster)
+
+    def _exec_sample(X):
+        map_eval = client.map(func, X)
+        if verbosity:
+            progress(map_eval)
+        result = client.gather(map_eval)
+        return ot.Sample(result)
+
+    return _exec_sample, cluster, client
+
+
 @FunctionDecorator(enableCache=True)
 class Parallelizer(ot.OpenTURNSPythonFunction):
 
@@ -559,23 +580,24 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     wrapper : ot.Function or instance of ot.OpenTURNSPythonFunction
         openturns wrapper to be distributed
 
-    backend : string (Optional)
-        Whether to parallelize using 'ipyparallel', 'joblib', 'pathos', 'multiprocessing', 'dask' or
-        'serial'. Serial backend means unit evaluation, with a progress bar if verbosity is True.
+    backend : str, optional
+        Whether to parallelize using 'ipyparallel', 'joblib', 'pathos',
+        'multiprocessing', 'dask/ssh', 'dask/slurm' or 'serial'.
+        Default is multiprocessing.
+        Also the backend will fallback to multiprocessing when the corresponding third-party
+        cannot be imported.
 
-    n_cpus : int (Optional)
+    n_cpus : int, optional
         Number of CPUs on which the simulations will be distributed. Needed Only
         if using 'joblib', pathos or 'multiprocessing' as backend.
         If n_cpus = 1, the behavior is the same as 'serial'.
 
-    verbosity : bool (Optional)
-        Verbose parameter when using 'serial', 'joblib', 'multiprocessing' or 'dask'.
+    verbosity : bool, optional
+        Whether to display a progress bar.
         Default is True.
-        For 'joblib', 'multiprocessing' and 'serial', a progress bar is displayed using tqdm module.
-        For 'dask' is used, the progress bar provided by dask is used.
 
-    dask_args : dict (Optional)
-        Dictionnary parameters when using 'dask'. It must follow this form:
+    dask_args : dict, optional
+        Dictionnary parameters when using Dask SSH Cluster. It must follow this form:
         {'scheduler': ip adress or host name,
         'workers': {'ip adress or host name': n_cpus},
         'remote_python': {'ip adress or host name': path_to_bin_python}}.
@@ -583,6 +605,10 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         When dask is chosen, the argument n_cpus is not used. The progress bar is enabled if
         verbosity is True.
         The dask dashboard is enabled at port 8787.
+
+    dask_slurmcluster_kwargs : dict, optional
+        Parameters to instantiate the Dask SLURMCluster object.
+        The argument n_cpus is used to set the default number of workers (n_workers).
 
     Examples
     --------
@@ -601,7 +627,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     """
 
     def __init__(self, wrapper, backend='multiprocessing', n_cpus=-1, verbosity=True,
-                 dask_args=None):
+                 dask_args=None, dask_slurmcluster_kwargs={}):
 
         # -1 cpus means all available cpus - 1 for the scheduler
         if n_cpus == -1:
@@ -622,9 +648,13 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         self.setInputDescription(self.wrapper.getInputDescription())
         self.setOutputDescription(self.wrapper.getOutputDescription())
 
+        if backend == "dask":
+            backend = "dask/ssh"
+            warnings.warn("'dask' backend is deprecated, use 'dask/ssh'", DeprecationWarning)
+
         assert backend in ['serial', 'ipython', 'ipyparallel',
                            'multiprocessing', 'pathos',
-                           'joblib', 'dask'], "Unknown backend"
+                           'joblib', 'dask/ssh', 'dask/slurm'], f"Unknown backend: {backend}"
 
         # This configures how to run samples on the model :
         if backend == 'serial' or self.n_cpus == 1:
@@ -679,12 +709,11 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         elif backend == 'pathos':
             self._exec_sample = _exec_sample_pathos(self.wrapper, self.n_cpus)
 
-        elif backend == 'dask':
-
+        elif backend == "dask/ssh":
             assert 'scheduler' in self.dask_args, 'dask_args must have "scheduler" as key'
             assert 'workers' in self.dask_args, 'dask_args must have "workers" as key'
 
-            self._exec_sample, self.dask_cluster, self.dask_client = _exec_sample_dask(
+            self._exec_sample, self.dask_cluster, self.dask_client = _exec_sample_dask_ssh(
                 self.wrapper, self.dask_args, self.verbosity)
 
             def close_dask():
@@ -694,3 +723,14 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
                 self.dask_cluster.close()
 
             self.close_dask = close_dask
+
+        elif backend == "dask/slurm":
+
+            slurmcluster_kwargs = dict(dask_slurmcluster_kwargs)
+            slurmcluster_kwargs.setdefault("n_workers", n_cpus)
+            slurmcluster_kwargs.setdefault("cores", 1)
+            slurmcluster_kwargs.setdefault("memory", "512 MB")
+            slurmcluster_kwargs.setdefault("death_timeout", 300)
+            slurmcluster_kwargs.setdefault("log_directory", "logs")
+            self._exec_sample, self.dask_cluster, self.dask_client = _exec_sample_dask_slurm(
+                self.wrapper, n_cpus, slurmcluster_kwargs, self.verbosity)
