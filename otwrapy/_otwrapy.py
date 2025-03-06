@@ -70,7 +70,7 @@ def safemakedirs(folder):
         Path of the folder to be created.
     """
     try:
-        os.makedirs(exist_ok=True)
+        os.makedirs(folder, exist_ok=True)
     except FileExistsError:
         # can still raise even with exist_ok because of concurent processes
         pass
