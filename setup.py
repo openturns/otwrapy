@@ -34,7 +34,6 @@ setup(
     author="Phimeca",
     description="General purpose OpenTURNS python wrapper tools",
     long_description=long_description,
-    setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     include_package_data=True,
     package_data={'otwrapy': ['examples/beam/*']},

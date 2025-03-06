@@ -6,7 +6,7 @@ General purpose OpenTURNS python wrapper tools
 
 import os
 
-__version__ = "0.12.1"
+__version__ = "0.13"
 
 base_dir = os.path.dirname(__file__)
 
