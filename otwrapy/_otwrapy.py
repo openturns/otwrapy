@@ -258,65 +258,55 @@ class TempWorkDir(object):
 
     Parameters
     ----------
-    base_temp_work_dir : str (optional)
+    base_temp_work_dir : str, optional
         Root path where the temporary working directory will be created. If None,
         it will default to the platform dependant temporary working directory
         Default = None
 
-    prefix : str (optional)
+    prefix : str, optional
         String that preceeds the directory name.
         Default = 'run-'
 
-    cleanup : bool (optional)
+    cleanup : bool, optional
         If True erase the directory and its children at the exit.
         Default = False
 
-    transfer : list (optional)
+    transfer : list, optional
         List of files or folders to transfer to the temporary working directory
+
+    chdir : bool, optional
+        Whether to change directory to the temporary working directory.
+        Default is False, should not be necessary and intended for backward compatibility only.
 
     Examples
     --------
     In the following example, everything that is executed inside the `with`
     environment will happen at a temporary working directory created at
     :file:`/tmp` with :file:`/run-` as a prefix. The created directory will be
-    erased upon the exit of the  `with` environment and python will go
-    back to the preceding working directory, even if an Exception is raised.
+    erased upon the exit of the `with` environment, even if an Exception is raised.
 
     >>> import otwrapy as otw
-    >>> import os
-    >>> print "I'm on my project directory"
-    >>> print os.getcwd()
-    >>> with otw.TempWorkDir('/tmp', prefix='run-', cleanup=True):
-    >>>     #
-    >>>     # Do stuff
-    >>>     #
-    >>>     print "..."
-    >>>     print "Now I'm in a temporary directory"
-    >>>     print os.getcwd()
-    >>>     print "..."
-    >>> print "I'm back to my project directory :"
-    >>> print os.getcwd()
-    I'm on my project directory
-    /home/aguirre/otwrapy
-    ...
-    Now I'm in a temporary directory
-    /tmp/run-pZYpzQ
-    ...
-    I'm back to my project directory :
-    /home/aguirre/otwrapy
+    >>> import subprocess
+    >>> with otw.TempWorkDir('/tmp', prefix='run-', cleanup=True) as cwd:
+    >>> ... print(cwd)
+    >>> ... # [write input files]
+    >>> ... subprocess.run(["myexe", "input.txt"], cwd=cwd) # doctest: +SKIP
+    >>> ... # [read output files]
     """
 
     def __init__(self, base_temp_work_dir=None, prefix='run-', cleanup=False,
-                 transfer=None):
+                 transfer=None, chdir=False):
         if base_temp_work_dir is not None:
             safemakedirs(base_temp_work_dir)
         self.dirname = mkdtemp(dir=base_temp_work_dir, prefix=prefix)
         self.cleanup = cleanup
         self.transfer = transfer
+        self.chdir = chdir
 
     def __enter__(self):
         self.curdir = os.getcwd()
-        os.chdir(self.dirname)
+        if self.chdir:
+            os.chdir(self.dirname)
         if self.transfer is not None:
             for file in self.transfer:
                 if os.path.isfile(file):
@@ -332,7 +322,8 @@ class TempWorkDir(object):
         return self.dirname
 
     def __exit__(self, type, value, traceback):
-        os.chdir(self.curdir)
+        if self.chdir:
+            os.chdir(self.curdir)
         if self.cleanup:
             shutil.rmtree(self.dirname)
 
