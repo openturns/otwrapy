@@ -606,7 +606,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         verbosity is True.
         The dask dashboard is enabled at port 8787.
 
-    dask_slurmcluster_kw : dict, optional
+    slurmcluster_kw : dict, optional
         Parameters to instantiate the Dask SLURMCluster object.
         The argument n_cpus is used to set the default number of workers (n_workers).
 
@@ -627,7 +627,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     """
 
     def __init__(self, wrapper, backend='multiprocessing', n_cpus=-1, verbosity=True,
-                 dask_args=None, dask_slurmcluster_kw={}):
+                 dask_args=None, slurmcluster_kw={}):
 
         # -1 cpus means all available cpus - 1 for the scheduler
         if n_cpus == -1:
@@ -726,7 +726,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
 
         elif backend == "dask/slurm":
 
-            slurmcluster_kw = dict(dask_slurmcluster_kw)
+            slurmcluster_kw = dict(slurmcluster_kw)
             slurmcluster_kw.setdefault("n_workers", n_cpus)
             slurmcluster_kw.setdefault("cores", 1)
             slurmcluster_kw.setdefault("memory", "512 MB")
