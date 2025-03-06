@@ -4,7 +4,7 @@
 General purpose OpenTURNS python wrapper
 """
 
-__all__ = ['X_distribution']
+__all__ = ['distribution']
 
 import openturns as ot
 import os
@@ -31,4 +31,4 @@ SR_cor = ot.CorrelationMatrix(len(marginal_distributions))
 SR_cor[2, 3] = -0.2
 copula = ot.NormalCopula(ot.NormalCopula.GetCorrelationFromSpearmanCorrelation(SR_cor))
 
-X_distribution = ot.ComposedDistribution(marginal_distributions, copula)
+distribution = ot.ComposedDistribution(marginal_distributions, copula)

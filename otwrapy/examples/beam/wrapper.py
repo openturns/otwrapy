@@ -225,10 +225,10 @@ if __name__ == '__main__':
     print("The wrapper has been instantiated as 'model'.")
 
     if args.MonteCarlo is not None:
-        from _probability_model import X_distribution
+        from _probability_model import distribution
         ot.RandomGenerator.SetSeed(args.seed)
         N = int(args.MonteCarlo[0])
-        X = X_distribution.getSample(N)
+        X = distribution.getSample(N)
         print("Generated a MonteCarlo DOE of size {}".format(N))
 
     elif args.X is not None:
