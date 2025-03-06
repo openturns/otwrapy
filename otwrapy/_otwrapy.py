@@ -582,9 +582,11 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         cannot be imported.
 
     n_cpus : int, optional
-        Number of CPUs on which the simulations will be distributed. Needed Only
+        Number of CPUs on which the simulations will be distributed. Needed only
         if using 'joblib', pathos or 'multiprocessing' as backend.
         If n_cpus = 1, the behavior is the same as 'serial'.
+        The default is -1, which means multiprocessing.cpu_count / 2
+        Note that for remote/distributed backends this may not reflect the remote node capabilities.
 
     verbosity : bool, optional
         Whether to display a progress bar.
