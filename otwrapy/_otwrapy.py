@@ -69,8 +69,11 @@ def safemakedirs(folder):
     folder : str
         Path of the folder to be created.
     """
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+    try:
+        os.makedirs(exist_ok=True)
+    except FileExistsError:
+        # can still raise even with exist_ok because of concurent processes
+        pass
 
 
 def create_logger(logfile, loglevel=None):
