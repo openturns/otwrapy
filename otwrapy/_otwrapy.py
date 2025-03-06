@@ -8,18 +8,14 @@ import pickle
 from tempfile import mkdtemp
 import shutil
 from functools import wraps
-import importlib
 import logging
 import warnings
 import openturns as ot
 import numpy as np
 from tqdm import tqdm
 
-__all__ = ['load_array', 'dump_array', '_exec_sample_joblib',
-           '_exec_sample_multiprocessing', '_exec_sample_ipyparallel',
-           '_exec_sample_pathos', '_exec_sample_dask_ssh', '_exec_sample_dask_slurm',
-           'FunctionDecorator', 'TempWorkDir', 'Parallelizer',
-           'create_logger', 'Debug', 'safemakedirs']
+__all__ = ['load_array', 'dump_array','safemakedirs', 'create_logger',
+           'FunctionDecorator', 'TempWorkDir', 'Parallelizer', 'Debug']
 
 
 base_dir = os.path.dirname(__file__)
@@ -617,7 +613,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     `model` is already an :class:`ot.Function`.
     """
 
-    def __init__(self, wrapper, backend='multiprocessing', n_cpus=-1, verbosity=True,
+    def __init__(self, wrapper, backend="multiprocessing", n_cpus=-1, verbosity=True,
                  dask_args=None, slurmcluster_kw={}):
 
         # -1 cpus means all available cpus - 1 for the scheduler
@@ -642,62 +638,28 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         if backend == "dask":
             backend = "dask/ssh"
             warnings.warn("'dask' backend is deprecated, use 'dask/ssh'", DeprecationWarning)
+        if backend == "ipython":
+            backend = "ipyparallel"
+            warnings.warn("'ipython' backend is deprecated, use 'ipyparallel'", DeprecationWarning)
 
-        assert backend in ['serial', 'ipython', 'ipyparallel',
-                           'multiprocessing', 'pathos',
-                           'joblib', 'dask/ssh', 'dask/slurm'], f"Unknown backend: {backend}"
+        assert backend in ["serial", "ipyparallel", "multiprocessing", "pathos",
+                           "joblib", "dask/ssh", "dask/slurm"], f"Unknown backend: {backend}"
 
         # This configures how to run samples on the model :
-        if backend == 'serial' or self.n_cpus == 1:
+        if backend == "serial" or self.n_cpus == 1:
             self._exec_sample = _exec_sample_serial(self.wrapper, self.verbosity)
 
-        elif (backend == 'ipython') or (backend == 'ipyparallel'):
-            # Check that ipyparallel is installed
-            try:
-                import ipyparallel as ipp
-                # If it is, see if there is a cluster running
-                try:
-                    _ = ipp.Client()
-                    ipy_backend = True
-                except (ipp.error.TimeoutError, IOError):
-                    ipy_backend = False
-                    logging.warning('Unable to connect to an ipython cluster.')
-            except ImportError:
-                ipy_backend = False
-                logging.warning('ipyparallel package missing.')
+        elif backend == "ipyparallel":
+            self._exec_sample = _exec_sample_ipyparallel(self.wrapper)
 
-            if ipy_backend:
-                self._exec_sample = _exec_sample_ipyparallel(self.wrapper)
-            else:
-                logging.warning('Using multiprocessing backend instead')
-                self._exec_sample = _exec_sample_multiprocessing(self.wrapper,
-                                                                 self.n_cpus,
-                                                                 self.verbosity)
+        elif backend == "joblib":
+            self._exec_sample = _exec_sample_joblib(self.wrapper, self.n_cpus, self.verbosity)
 
-        elif backend == 'joblib':
-            # Check that joblib is installed
-            try:
-                importlib.import_module("joblib")
-                joblib_backend = True
-            except ImportError:
-                joblib_backend = False
-                logging.warning('joblib package missing.')
-
-            if joblib_backend:
-                self._exec_sample = _exec_sample_joblib(self.wrapper,
-                                                        self.n_cpus,
-                                                        self.verbosity)
-            else:
-                logging.warning('Using multiprocessing backend instead')
-                self._exec_sample = _exec_sample_multiprocessing(self.wrapper,
-                                                                 self.n_cpus,
-                                                                 self.verbosity)
-
-        elif backend == 'multiprocessing':
+        elif backend == "multiprocessing":
             self._exec_sample = _exec_sample_multiprocessing(
                 self.wrapper, self.n_cpus, self.verbosity)
 
-        elif backend == 'pathos':
+        elif backend == "pathos":
             self._exec_sample = _exec_sample_pathos(self.wrapper, self.n_cpus)
 
         elif backend == "dask/ssh":
@@ -720,7 +682,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
             slurmcluster_kw = dict(slurmcluster_kw)
             slurmcluster_kw.setdefault("n_workers", n_cpus)
             slurmcluster_kw.setdefault("cores", 1)
-            slurmcluster_kw.setdefault("memory", "512 MB")
+            slurmcluster_kw.setdefault("memory", "1 GB")
             slurmcluster_kw.setdefault("death_timeout", 300)
             slurmcluster_kw.setdefault("log_directory", "logs")
             self._exec_sample, self.dask_cluster, self.dask_client = _exec_sample_dask_slurm(
