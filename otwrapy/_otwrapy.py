@@ -629,7 +629,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         # -1 cpus means all available cpus - 1 for the scheduler
         if n_cpus == -1:
             import multiprocessing
-            n_cpus = multiprocessing.cpu_count() - 1
+            n_cpus = max(multiprocessing.cpu_count() // 2 - 1, 1)
 
         self.n_cpus = n_cpus
         self.wrapper = wrapper
@@ -690,8 +690,9 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         elif backend == "dask/slurm":
 
             slurmcluster_kw = dict(slurmcluster_kw)
-            slurmcluster_kw.setdefault("n_workers", n_cpus)
-            slurmcluster_kw.setdefault("cores", 1)
+            slurmcluster_kw.setdefault("n_workers", 1)
+            slurmcluster_kw.setdefault("cores", n_cpus)
+            slurmcluster_kw.setdefault("processes", n_cpus)
             slurmcluster_kw.setdefault("memory", "512 MB")
             slurmcluster_kw.setdefault("death_timeout", 300)
             slurmcluster_kw.setdefault("log_directory", "logs")
