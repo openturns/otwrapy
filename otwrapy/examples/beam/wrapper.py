@@ -102,20 +102,22 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         time.sleep(self.sleep)
 
         # File management. Move to temp work dir. Cleanup at the end
-        with otw.TempWorkDir(self.temp_work_dir, 'ot-beam-example-', True):
+        with otw.TempWorkDir(self.temp_work_dir, 'ot-beam-example-', cleanup=True) as cwd:
 
             # Create input file
-            self._create_input_file(X)
+            infn = os.path.join(cwd, 'beam.xml')
+            self._create_input_file(X, infn)
 
             # Execute code
-            _ = self._call()
+            _ = self._call(cwd)
 
             # Retrieve output (see also ot.coupling_tools.get_value)
-            Y = self._parse_output()
+            outfn = os.path.join(cwd, '_beam_outputs_.xml')
+            Y = self._parse_output(outfn)
 
         return Y
 
-    def _create_input_file(self, X):
+    def _create_input_file(self, X, infn):
         """Create the input file required by the code.
 
         Replace the values of the vector :math:`X` to their corresponding tokens
@@ -126,15 +128,22 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         ----------
         X : 1D array (e.g. ot.Point or a 1D np.array)
             Input vector of size :math:`n` on which the model will be evaluated
+        infn : str
+            Input file name
         """
         otct.replace(
             self.input_template,
-            'beam.xml',
+            infn,
             ['@F', '@E', '@L', '@I'],
             X)
 
-    def _call(self):
+    def _call(self, cwd):
         """Execute code on the shell and return the runtime
+
+        Parameters
+        ----------
+        cwd : str
+            Working directory
 
         Returns
         -------
@@ -143,13 +152,18 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         """
 
         time_start = time.time()
-        otct.execute(self.executable, shell=True)
+        otct.execute(self.executable, shell=True, cwd=cwd)
         time_stop = time.time()
 
         return time_stop - time_start
 
-    def _parse_output(self):
+    def _parse_output(self, outfn):
         """Parse the XML output given by the code and get the value of deviation
+
+        Parameters
+        ----------
+        outfn : str
+            Output file name
 
         Returns
         -------
@@ -158,7 +172,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         """
 
         # Retrieve output (see also coupling_tools.get_value)
-        xmldoc = minidom.parse('_beam_outputs_.xml')
+        xmldoc = minidom.parse(outfn)
         itemlist = xmldoc.getElementsByTagName('outputs')
         deviation = float(itemlist[0].attributes['deviation'].value)
 

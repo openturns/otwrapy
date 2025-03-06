@@ -1,6 +1,7 @@
 = 0.13 release (wip)
 
 * Add Dask/SLURM backend
+* TempWorkDir does not change directory anymore by default
 
 = 0.12.1 release (2024-01-18)
 
