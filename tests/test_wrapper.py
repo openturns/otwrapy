@@ -3,18 +3,25 @@ import otwrapy as otw
 import openturns as ot
 import multiprocessing
 import pytest
+import importlib
 
 try:
-    import pathos
+    importlib.import_module("pathos")
     have_pathos = True
 except ImportError:
     have_pathos = False
 
 try:
-    import ipyparallel
+    importlib.import_module("ipyparallel")
     have_ipyparallel = True
 except ImportError:
     have_ipyparallel = False
+
+try:
+    importlib.import_module("joblib")
+    have_joblib = True
+except ImportError:
+    have_joblib = False
 
 
 def backendtest(backend):
@@ -25,12 +32,18 @@ def backendtest(backend):
     if n_cpu > 3:
         sizes.append(n_cpu - 2)
     model = ex_beam.Wrapper(sleep=0.2)
+    dask_args = None
+    ipp_client_kw = {}
     if backend == "dask":
         dask_args = {"scheduler": "localhost", "workers": {"localhost": n_cpu}}
-    else:
-        dask_args = None
-    model_parallel = otw.Parallelizer(model, backend=backend,
-                                      n_cpus=n_cpu, dask_args=dask_args)
+    elif backend == "ipyparallel":
+        import ipyparallel as ipp
+        cluster = ipp.Cluster()
+        cluster.start_controller_sync()
+        cluster.start_engines_sync(n=n_cpu)
+        ipp_client_kw = {"cluster_id": cluster.cluster_id}
+    model_parallel = otw.Parallelizer(model, backend=backend, n_cpus=n_cpu,
+                                      dask_args=dask_args, ipp_client_kw=ipp_client_kw)
     for size in sizes:
         X_sample = ex_beam.distribution.getSample(size)
         Y_ref = model(X_sample)
@@ -42,12 +55,13 @@ def test_serial():
     backendtest("serial")
 
 
-def test_joblib():
-    backendtest("joblib")
-
-
 def test_multiprocessing():
     backendtest("multiprocessing")
+
+
+@pytest.mark.skipif(not have_joblib, reason="N/A")
+def test_joblib():
+    backendtest("joblib")
 
 
 @pytest.mark.skipif(not have_ipyparallel, reason="N/A")
@@ -61,5 +75,10 @@ def test_pathos():
 
 
 @pytest.mark.skip(reason="needs passwordless ssh configuration")
-def test_dask():
+def test_dask_ssh():
     backendtest("dask/ssh")
+
+
+@pytest.mark.skip(reason="needs a SLURM cluster")
+def test_dask_slurm():
+    backendtest("dask/slurm")

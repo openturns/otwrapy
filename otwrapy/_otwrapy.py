@@ -14,7 +14,7 @@ import openturns as ot
 import numpy as np
 from tqdm import tqdm
 
-__all__ = ['load_array', 'dump_array','safemakedirs', 'create_logger',
+__all__ = ['load_array', 'dump_array', 'safemakedirs', 'create_logger',
            'FunctionDecorator', 'TempWorkDir', 'Parallelizer', 'Debug']
 
 
@@ -476,7 +476,7 @@ def _exec_sample_pathos(func, n_cpus):
     return _exec_sample
 
 
-def _exec_sample_ipyparallel(func):
+def _exec_sample_ipyparallel(func, n_cpus, ipp_client_kw):
     """Return a function that executes a sample in parallel using ipyparallel.
 
     Parameters
@@ -488,6 +488,9 @@ def _exec_sample_ipyparallel(func):
     n_cpus : int
         Number of CPUs on which to distribute the function calls.
 
+    ipp_client_kw : dict
+        Client parameters
+
     Returns
     -------
     _exec_sample : Function or callable
@@ -495,9 +498,10 @@ def _exec_sample_ipyparallel(func):
     """
     import ipyparallel as ipp
 
-    rc = ipp.Client()
+    client = ipp.Client(**ipp_client_kw)
+    client.wait_for_engines(n_cpus, timeout=30)
 
-    return lambda X: rc[:].map_sync(func, X)
+    return lambda X: client[:].map_sync(func, X)
 
 
 def _exec_sample_dask_ssh(func, dask_args, verbosity):
@@ -597,6 +601,9 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
         Parameters to instantiate the Dask SLURMCluster object.
         The argument n_cpus is used to set the default number of workers (n_workers).
 
+    ipp_client_kw : dict, optional
+        Parameters to instantiate the IPython Parallel Client, like "cluster_id", etc.
+
     Examples
     --------
     For example, in order to parallelize the beam wrapper :class:`examples.beam.Wrapper`
@@ -614,7 +621,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
     """
 
     def __init__(self, wrapper, backend="multiprocessing", n_cpus=-1, verbosity=True,
-                 dask_args=None, slurmcluster_kw={}):
+                 dask_args=None, slurmcluster_kw={}, ipp_client_kw={}):
 
         # -1 cpus means all available cpus - 1 for the scheduler
         if n_cpus == -1:
@@ -650,7 +657,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
             self._exec_sample = _exec_sample_serial(self.wrapper, self.verbosity)
 
         elif backend == "ipyparallel":
-            self._exec_sample = _exec_sample_ipyparallel(self.wrapper)
+            self._exec_sample = _exec_sample_ipyparallel(self.wrapper, self.n_cpus, ipp_client_kw)
 
         elif backend == "joblib":
             self._exec_sample = _exec_sample_joblib(self.wrapper, self.n_cpus, self.verbosity)
@@ -682,7 +689,7 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
             slurmcluster_kw = dict(slurmcluster_kw)
             slurmcluster_kw.setdefault("n_workers", n_cpus)
             slurmcluster_kw.setdefault("cores", 1)
-            slurmcluster_kw.setdefault("memory", "1 GB")
+            slurmcluster_kw.setdefault("memory", "512 MB")
             slurmcluster_kw.setdefault("death_timeout", 300)
             slurmcluster_kw.setdefault("log_directory", "logs")
             self._exec_sample, self.dask_cluster, self.dask_client = _exec_sample_dask_slurm(
