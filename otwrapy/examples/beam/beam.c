@@ -18,6 +18,13 @@ int main(int argc, const char* argv[])
     }
   }
 
+  if (!fileName)
+  {
+    fprintf(stderr, "beam: fileName is not set\n");
+    fflush(stderr);
+    return 3;
+  }
+
   const char *input_names[4];
   input_names[0] = "F";
   input_names[1] = "E";
@@ -28,6 +35,13 @@ int main(int argc, const char* argv[])
   int compute_gradient = 0;
 
   xmlDoc *doc = xmlReadFile(fileName, NULL, 0);
+  if (!doc)
+  {
+    fprintf(stderr, "beam: xmlReadFile(%s) returned NULL\n", fileName);
+    fflush(stderr);
+    return 4;
+  }
+
   xmlNode *root_element = xmlDocGetRootElement(doc);
   xmlNode *cur = root_element->children;
   while (cur != NULL) {
@@ -64,6 +78,12 @@ int main(int argc, const char* argv[])
 //   printf("deviation=%e\n", deviation);
 
   xmlTextWriterPtr writer = xmlNewTextWriterFilename("_beam_outputs_.xml", 0);
+  if (!writer)
+  {
+    fprintf(stderr, "beam: xmlNewTextWriterFilename(_beam_outputs_.xml) returned NULL\n");
+    fflush(stderr);
+    return 5;
+  }
   xmlTextWriterStartDocument(writer, NULL, "UTF-8", NULL);
   xmlTextWriterStartElement(writer, "beam");
     xmlTextWriterStartElement(writer, "description");
