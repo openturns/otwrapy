@@ -2,6 +2,7 @@
 
 * Add Dask/SLURM backend
 * TempWorkDir does not change directory anymore by default
+* TempWorkDir base_temp_work_dir argument is deprecated for dir
 * Parallelizer does not implicitely fallback to multiprocessing anymore
 
 = 0.12.1 release (2024-01-18)

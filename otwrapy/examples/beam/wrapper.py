@@ -102,7 +102,7 @@ class Wrapper(ot.OpenTURNSPythonFunction):
         time.sleep(self.sleep)
 
         # File management. Move to temp work dir. Cleanup at the end
-        with otw.TempWorkDir(self.temp_work_dir, 'ot-beam-example-', cleanup=True) as cwd:
+        with otw.TempWorkDir(dir=self.temp_work_dir, prefix='ot-beam-example-', cleanup=True) as cwd:
 
             # Create input file
             infn = os.path.join(cwd, 'beam.xml')

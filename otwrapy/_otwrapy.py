@@ -251,15 +251,14 @@ class TempWorkDir(object):
 
     """Implement a context manager that creates a temporary working directory.
 
-    Create a temporary working directory on `base_temp_work_dir` preceded by
+    Create a temporary working directory in `dir` preceded by
     `prefix` and clean up at the exit if necessary.
-    See: http://sametmax.com/les-context-managers-et-le-mot-cle-with-en-python/
 
     Parameters
     ----------
-    base_temp_work_dir : str, optional
+    dir : str, optional
         Root path where the temporary working directory will be created. If None,
-        it will default to the platform dependant temporary working directory
+        it will default to the platform dependent temporary working directory
         Default = None
 
     prefix : str, optional
@@ -293,11 +292,14 @@ class TempWorkDir(object):
     >>> ... # [read output files]
     """
 
-    def __init__(self, base_temp_work_dir=None, prefix='run-', cleanup=False,
-                 transfer=None, chdir=False):
+    def __init__(self, dir=None, base_temp_work_dir=None, prefix='run-',
+                 cleanup=False, transfer=None, chdir=False):
         if base_temp_work_dir is not None:
-            safemakedirs(base_temp_work_dir)
-        self.dirname = mkdtemp(dir=base_temp_work_dir, prefix=prefix)
+            dir = base_temp_work_dir
+            warnings.warn("TempWorkDir 'base_temp_work_dir' argument is deprecated, use 'dir'", DeprecationWarning)
+        if dir is not None:
+            safemakedirs(dir)
+        self.dirname = mkdtemp(dir=dir, prefix=prefix)
         self.cleanup = cleanup
         self.transfer = transfer
         self.chdir = chdir
@@ -696,7 +698,5 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
             slurmcluster_kw.setdefault("cores", n_cpus)
             slurmcluster_kw.setdefault("processes", n_cpus)
             slurmcluster_kw.setdefault("memory", "512 MB")
-            slurmcluster_kw.setdefault("death_timeout", 300)
-            slurmcluster_kw.setdefault("log_directory", "logs")
             self._exec_sample, self.dask_cluster, self.dask_client = _exec_sample_dask_slurm(
                 self.wrapper, n_cpus, slurmcluster_kw, self.verbosity)
