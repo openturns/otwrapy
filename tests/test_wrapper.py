@@ -74,6 +74,14 @@ def test_pathos():
     backendtest("pathos")
 
 
+def test_concurrent_thread():
+    backendtest("concurrent/thread")
+
+
+def test_concurrent_process():
+    backendtest("concurrent/process")
+
+
 @pytest.mark.skip(reason="needs passwordless ssh configuration")
 def test_dask_ssh():
     backendtest("dask/ssh")
