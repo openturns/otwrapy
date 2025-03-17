@@ -509,6 +509,52 @@ def _exec_sample_ipyparallel(func, n_cpus, ipp_client_kw):
     return lambda X: client[:].map_sync(func, X)
 
 
+def _exec_sample_concurrent(func, n_cpus, executor_name, verbosity):
+    """Return a function that executes a sample in parallel using concurrent thread or process.
+
+    Parameters
+    ----------
+    func : Function or callable
+        A callable python object, usually a function. The function should take
+        an input vector as argument and return an output vector.
+    n_cpus : int
+        Number of CPUs on which to distribute the function calls.
+    executor_name : str
+        Name of the executor to use : either "thread" or "process".
+    verbosity : bool
+        If True, the progress bar is displayed.
+
+    Returns
+    -------
+    _exec_sample : Function or callable
+        The parallelized function.
+    """
+
+    def _exec_sample(X):
+        from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
+        pool_executor = {'thread': ThreadPoolExecutor, 'process': ProcessPoolExecutor}
+
+        if verbosity:
+            pbar = tqdm(total=ot.Sample(X).getSize())
+        with pool_executor[executor_name](max_workers=n_cpus) as executor:
+            # resu = executor.map(func, X)
+            # Y = ot.Sample([xx for xx in resu])
+            resu = {executor.submit(func, x): x for x in X}
+            for future in as_completed(resu):
+                try:
+                    _ = future.result()
+                    if verbosity:
+                        pbar.update(1)
+                except Exception:
+                    raise Exception('Error when evaluating %r. ' % resu[future])
+            Y = [task.result() for task in resu]
+        if verbosity:
+            pbar.close()
+
+        return Y
+    return _exec_sample
+
+
 def _exec_sample_dask_ssh(func, dask_args, verbosity):
 
     from dask.distributed import Client, progress, SSHCluster
@@ -578,7 +624,8 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
 
     backend : str, optional
         Whether to parallelize using 'ipyparallel', 'joblib', 'pathos',
-        'multiprocessing', 'dask/ssh', 'dask/slurm' or 'serial'.
+        'multiprocessing', 'dask/ssh', 'dask/slurm', 'concurrent/thread', 'concurrent/process'
+        or 'serial'.
         Default is multiprocessing.
         Also the backend will fallback to multiprocessing when the corresponding third-party
         cannot be imported.
@@ -657,7 +704,8 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
             warnings.warn("'ipython' backend is deprecated, use 'ipyparallel'", DeprecationWarning)
 
         assert backend in ["serial", "ipyparallel", "multiprocessing", "pathos",
-                           "joblib", "dask/ssh", "dask/slurm"], f"Unknown backend: {backend}"
+                           "joblib", "dask/ssh", "dask/slurm",
+                           "concurrent/thread", "concurrent/process"], f"Unknown backend: {backend}"
 
         # This configures how to run samples on the model :
         if backend == "serial" or self.n_cpus == 1:
@@ -675,6 +723,13 @@ class Parallelizer(ot.OpenTURNSPythonFunction):
 
         elif backend == "pathos":
             self._exec_sample = _exec_sample_pathos(self.wrapper, self.n_cpus)
+
+        elif backend == "concurrent/thread":
+            self._exec_sample = _exec_sample_concurrent(
+                self.wrapper, self.n_cpus, "thread", self.verbosity)
+        elif backend == "concurrent/process":
+            self._exec_sample = _exec_sample_concurrent(
+                self.wrapper, self.n_cpus, "process", self.verbosity)
 
         elif backend == "dask/ssh":
             assert 'scheduler' in self.dask_args, 'dask_args must have "scheduler" as key'
