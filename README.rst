@@ -12,6 +12,7 @@ audience. Documentation is available
   `ot.Function <http://openturns.github.io/openturns/master/user_manual/_generated/openturns.Function.html>`_
   into  a parallel wrapper using either
   `multiprocessing <https://docs.python.org/2/library/multiprocessing.html>`_,
+  `concurrent.futures <https://docs.python.org/3/library/concurrent.futures.html>`_,
   `ipyparallel <http://ipyparallel.readthedocs.io/en/latest/>`_,
   `joblib <https://pythonhosted.org/joblib/>`_,
   `pathos <https://pypi.python.org/pypi/pathos>`_,
