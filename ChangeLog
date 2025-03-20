@@ -1,6 +1,8 @@
 = 0.13 release (wip)
 
 * Add Dask/SLURM backend
+* Add concurrent.futures backend
+* Deprecated "dask" backend in favor of "dask/ssh"
 * TempWorkDir does not change directory anymore by default
 * TempWorkDir base_temp_work_dir argument is deprecated for dir
 * Parallelizer does not implicitely fallback to multiprocessing anymore
