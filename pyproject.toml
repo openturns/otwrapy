@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "otwrapy"
+version = "0.13"
+description = "Simplify wrapping of external codes"
+readme = "README.rst"
+dependencies = [
+  "openturns",
+  "tqdm",
+]
+authors = [
+  {name = "Felipe Aguirre Martinez"},
+  {name = "Julien Schueller"},
+]
+license = {text= "LGPL-3.0-or-later"}
+classifiers = [
+  "Intended Audience :: Science/Research",
+  "Natural Language :: English",
+  "Topic :: Scientific/Engineering",
+]
+keywords = ["wrapping"]
+
+[tool.setuptools]
+packages = ["otwrapy",
+            "otwrapy.examples",
+            "otwrapy.examples.beam"]
+
+[tool.setuptools.package-data]
+otwrapy = ["examples/beam/**",
+          ]
+
+[project.optional-dependencies]
+doc = ["numpydoc", "sphinx"]
+all = [
+  "joblib",
+  "ipyparallel",
+  "pathos",
+  "dask",
+]
+
+[project.urls]
+Homepage = "https://github.com/openturns/otwrapy"
+Documentation = "http://openturns.github.io/otwrapy/master/"
+Repository = "https://github.com/openturns/otwrapy.git"
