@@ -12,7 +12,7 @@ jobs:
       - name: Build
         shell: bash -l {0}
         run: |
-          conda install -y openturns numpy pytest joblib ipyparallel pathos dask asyncssh sphinx numpydoc twine
+          conda install -y openturns numpy pytest joblib ipyparallel pathos dask asyncssh sphinx numpydoc twine python-build
           pip install .
           pytest -s
           make html -C doc BUILDDIR=~/.local/share/otwrapy/doc
@@ -37,7 +37,7 @@ jobs:
           TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
         run: |
-          python -m build
+          python -m build --wheel --no-isolation
           twine upload --non-interactive dist/*.whl
 
   conda-windows:
@@ -50,6 +50,6 @@ jobs:
           conda-remove-defaults: "true"
       - name: Build
         run: |
-          conda install -y openturns joblib ipyparallel pathos dask asyncssh numpy pytest
+          conda install -y "openturns>=1.25" joblib ipyparallel pathos dask asyncssh numpy pytest
           pytest -s
 
