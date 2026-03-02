@@ -31,4 +31,4 @@ SR_cor = ot.CorrelationMatrix(len(marginal_distributions))
 SR_cor[2, 3] = -0.2
 copula = ot.NormalCopula(ot.NormalCopula.GetCorrelationFromSpearmanCorrelation(SR_cor))
 
-distribution = ot.ComposedDistribution(marginal_distributions, copula)
+distribution = ot.JointDistribution(marginal_distributions, copula)
